@@ -10,7 +10,7 @@ type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 async function fetchArticle(slug: string) {
   try {
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const title = `${article.title} | GetCyberRight News`;
-  const description = article.excerpt || article.title;
+      const description = article.excerpt || `${article.title}. Cybersecurity analysis and threat intelligence from GetCyberRight, your trusted source for cyber awareness.`;
   const url = `${BASE_URL}/news/${article.slug}`;
   const ogImage = `${BASE_URL}/og/article/${article.slug}`;
 
@@ -46,6 +46,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title,
     description,
     alternates: { canonical: url },
+        robots: { index: true, follow: true },
     openGraph: {
       title,
       description,
@@ -90,7 +91,7 @@ export default async function NewsArticlePage({ params }: PageProps) {
       headline: article.title,
       description: article.excerpt || article.title,
       url: `${BASE_URL}/news/${article.slug}`,
-      datePublished: article.publishedAt || new Date().toISOString(),
+      datePublished: article.publishedAt || new Date().toISOString(),h
       dateModified: article.updatedAt || article.publishedAt || new Date().toISOString(),
       author: {
         "@type": "Person",
