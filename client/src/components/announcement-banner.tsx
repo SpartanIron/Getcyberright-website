@@ -88,7 +88,7 @@ export function AnnouncementBanner() {
   };
 
   const handleDismissAll = () => {
-    dismissAllAnnouncements();
+    try { localStorage.setItem(DISMISS_ALL_KEY, "true"); } catch {}
     setAllDismissed(true);
   };
 
