@@ -184,9 +184,11 @@ async function bootstrapFullApp() {
         if (!/^\/[a-zA-Z0-9\-_/.]+$/.test(stripped) || stripped.includes("//")) return next();
         const query = req.url.includes("?") ? req.url.slice(req.url.indexOf("?")) : "";
         return res.redirect(301, stripped + query);
-   await registerRoutes(httpServer, app);   }
+      }
       next();
     });
+
+      await registerRoutes(httpServer, app);
 
     app.use((req, res, next) => {
       const start = Date.now();
