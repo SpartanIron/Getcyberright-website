@@ -1919,5 +1919,21 @@ export const insertPushSubscriptionSchema = createInsertSchema(pushSubscriptions
   createdAt: true,
 });
 
+// Resource type for client-side resource components
+export interface Resource {
+    id: number;
+    title: string;
+    description: string;
+    type: string;
+    url?: string | null;
+    category?: string | null;
+    tags?: string[] | null;
+    thumbnailUrl?: string | null;
+    isFeatured?: boolean | null;
+    isPremium?: boolean | null;
+    createdAt?: Date | string | null;
+    updatedAt?: Date | string | null;
+}
+
 export type PushSubscription = typeof pushSubscriptions.$inferSelect;
 export type InsertPushSubscription = z.infer<typeof insertPushSubscriptionSchema>;
