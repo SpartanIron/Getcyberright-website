@@ -5802,6 +5802,7 @@ BEHAVIORAL CONSTRAINTS
 
 
   app.post("/api/scan", shieldRateLimit, async (req: Request, res: Response) => {
+    const traceId = `scan-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
     try {
       const parsed = shieldScanInputSchema.safeParse(req.body);
       if (!parsed.success) {
@@ -5813,6 +5814,8 @@ BEHAVIORAL CONSTRAINTS
       const consentIp = req.ip || req.socket.remoteAddress || "unknown";
       const userId = (req as any).session?.userId || undefined;
 
+      console.log(`[shield] [${traceId}] Starting scan for email=${email.replace(/(.{2}).*(@.*)/, "$1***$2")}`);
+
       const { startShieldScan } = await import("./shieldScanService");
       const { scanId } = await startShieldScan(
         { firstName, lastName, email, phone: phone || undefined, zip: zip || undefined },
@@ -5820,10 +5823,30 @@ BEHAVIORAL CONSTRAINTS
         userId,
       );
 
+      console.log(`[shield] [${traceId}] Scan started successfully scanId=${scanId}`);
       res.json({ scanId });
     } catch (error: any) {
-      console.error("[shield] Scan start error:", error?.message || error);
-      res.status(500).json({ error: "Something went wrong. Please try again in a few minutes." });
+      const errName = error?.name || "Error";
+      const errMsg = error?.message || String(error);
+      const errCode = error?.code || error?.cause?.code || null;
+      const errStack = error?.stack || null;
+      const causeMsg = error?.cause?.message || null;
+      console.error(
+        `[shield] [${traceId}] Scan start error name=${errName} code=${errCode} msg=${errMsg} cause=${causeMsg}`,
+      );
+      if (errStack) {
+        console.error(`[shield] [${traceId}] Stack: ${errStack}`);
+      }
+      const includeDiagnostic =
+        process.env.NODE_ENV !== "production" || process.env.SHIELD_DIAGNOSTIC === "1";
+      const body: { error: string; traceId: string; diagnostic?: { name: string; code: string | null; message: string } } = {
+        error: "Something went wrong. Please try again in a few minutes.",
+        traceId,
+      };
+      if (includeDiagnostic) {
+        body.diagnostic = { name: errName, code: errCode, message: errMsg };
+      }
+      res.status(500).json(body);
     }
   });
 
