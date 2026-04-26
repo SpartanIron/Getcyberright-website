@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import PageContent from "@/pages/scam-page";
+import { getScamBySlug } from "@shared/scam-content";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -17,6 +19,16 @@ const SCAM_META: Record<string, { title: string; description: string }> = {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { scamType } = await params;
+  const scam = getScamBySlug(scamType);
+
+  if (!scam) {
+    return {
+      title: "Scam Guide Not Found | GetCyberRight",
+      description: "The scam guide you are looking for does not exist or has been moved.",
+      robots: { index: false, follow: false },
+    };
+  }
+
   const meta = SCAM_META[scamType];
 
   if (meta) {
@@ -34,12 +46,25 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   return {
-    title: `${scamType.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase())} Scams | GetCyberRight`,
-    description: `Learn about ${scamType.replace(/-/g, " ")} scams, how they work, and how to protect yourself and your family.`,
+    title: scam.metaTitle || `${scam.title} | GetCyberRight`,
+    description: scam.metaDescription,
     alternates: { canonical: `${BASE_URL}/scams/${scamType}` },
+    openGraph: {
+      title: scam.metaTitle || scam.title,
+      description: scam.metaDescription,
+      url: `${BASE_URL}/scams/${scamType}`,
+      type: "article",
+    },
   };
 }
 
-export default function ScamTypePage() {
+export default async function ScamTypePage({ params }: PageProps) {
+  const { scamType } = await params;
+  const scam = getScamBySlug(scamType);
+
+  if (!scam) {
+    notFound();
+  }
+
   return <PageContent />;
 }

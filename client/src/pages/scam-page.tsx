@@ -74,7 +74,7 @@ export default function ScamPage() {
     type: "BreadcrumbList",
     items: [
       { name: "Home", url: "https://www.getcyberright.com/" },
-      { name: "GCR Scam Guard", url: "https://www.getcyberright.com/scam-checker" },
+      { name: "Scam Guides", url: "https://www.getcyberright.com/scams" },
       { name: scam.title, url: `https://www.getcyberright.com/scams/${scam.slug}` },
     ],
   };
