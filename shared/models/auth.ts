@@ -32,7 +32,7 @@ export const TIER_HIERARCHY: Record<SubscriptionTier, number> = {
   [SUBSCRIPTION_TIERS.ENTERPRISE]: 3,
 };
 
-export const FREE_ACCESS_UNTIL = new Date("2030-01-01T00:00:00Z");
+export const FREE_ACCESS_UNTIL = new Date("2024-01-01T00:00:00Z");
 
 export function isFreeAccessPeriod(): boolean {
   return new Date() < FREE_ACCESS_UNTIL;
