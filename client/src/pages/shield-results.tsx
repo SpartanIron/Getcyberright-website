@@ -897,142 +897,157 @@ function ShieldResultsPage() {
             </Card>
           )}
 
-          {hasPaidAccess && (
-            <Card>
-              <Card className="border-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 shadow-2xl overflow-hidden" data-testid="card-conversion-engine">
+{!hasPaidAccess && (
+            <Card className="border-0 shadow-2xl" style={{background: "linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)"}}>
               <CardContent className="p-0">
-                {(() => {
-                  const score = report?.exposureScore;
-                  const isCritical = score === "critical";
-                  const isHigh = score === "high";
-                  const isMedium = score === "medium";
-                  const isHighRisk = isCritical || isHigh;
-                  const brokersFound = report?.brokerResults?.filter(b => b.status === "found").length ?? 0;
-                  const breachCount = report?.breachResults?.filter(b => !b.breachName?.startsWith("__")).length ?? 0;
-                  const pendingBrokers = report?.brokerResults?.filter(b => b.status === "pending_verification" || b.status === "timed_out").length ?? 0;
-
-                  const headerBg = isCritical ? "bg-red-900/60 border-b border-red-700/50" :
-                    isHigh ? "bg-orange-900/50 border-b border-orange-700/50" :
-                    isMedium ? "bg-yellow-900/40 border-b border-yellow-700/40" :
-                    "bg-teal-900/30 border-b border-teal-700/30";
-
-                  const pulseColor = isCritical ? "bg-red-400" : isHigh ? "bg-orange-400" : isMedium ? "bg-yellow-400" : "bg-teal-400";
-
-                  const headerText = isCritical ? "CRITICAL RISK — Immediate action recommended" :
-                    isHigh ? "HIGH EXPOSURE — Your data is actively circulating" :
-                    isMedium ? "MEDIUM RISK — Evolving threats detected" :
-                    "LOW RISK — Threats change. Stay ahead of them.";
-
-                  const headline = isCritical ? "Your personal data is severely exposed." :
-                    isHigh ? "Your data is out there. And it's being used." :
-                    isMedium ? "Some exposure found. More may emerge." :
-                    "Clean for now — but threats don't stand still.";
-
-                  const body = isCritical || isHigh
-                    ? "We found your information on " + brokersFound + " data broker " + (brokersFound === 1 ? "site" : "sites") + " and in " + breachCount + " confirmed " + (breachCount === 1 ? "breach" : "breaches") + ". Data at this exposure level is actively used for identity theft, targeted phishing, and financial fraud. Continuous removal and monitoring are essential."
-                    : isMedium
-                    ? "We found some exposure in your scan. Similar patterns appear in scams targeting people with your profile. Threats evolve — what looks clean today can surface tomorrow through new data broker listings or breach releases."
-                    : "This scan found minimal exposure — which is genuinely good news. But data broker listings and breaches appear daily. A clean result today doesn't guarantee a clean result in 30 days. Ongoing monitoring is the only way to stay ahead.";
-
-                  const ctaLabel = isHighRisk ? "Activate protection now" : "Start continuous protection";
-                  const ctaBg = isHighRisk ? "bg-orange-500 hover:bg-orange-400 text-white" : "bg-teal-500 hover:bg-teal-400 text-white";
-                  const nextStepsHref = "/shield/next-steps?level=" + (score || "high");
-
-                  return (
-                    <>
-                      <div className={cn("px-6 py-4 flex items-center gap-3", headerBg)}>
-                        <div className={cn("w-2.5 h-2.5 rounded-full animate-pulse", pulseColor)} />
-                        <span className="text-xs font-semibold uppercase tracking-widest text-slate-300">{headerText}</span>
-                      </div>
-                      <div className="px-6 py-8">
-                        <div className="grid md:grid-cols-2 gap-8 items-center">
-                          <div>
-                            <h3 className="text-2xl font-bold text-white mb-3 leading-tight">{headline}</h3>
-                            <p className="text-slate-300 text-sm mb-5 leading-relaxed">{body}</p>
-                            <div className="space-y-2 mb-6">
-                              {brokersFound > 0 && (
-                                <div className="flex items-start gap-2 text-sm text-slate-300">
-                                  <span className="text-orange-400 mt-0.5 shrink-0">&#9888;</span>
-                                  <span><strong className="text-white">{brokersFound} data broker {brokersFound === 1 ? "site has" : "sites have"} your profile</strong> — your data is listed and sold</span>
-                                </div>
-                              )}
-                              {breachCount > 0 && (
-                                <div className="flex items-start gap-2 text-sm text-slate-300">
-                                  <span className="text-red-400 mt-0.5 shrink-0">&#9888;</span>
-                                  <span><strong className="text-white">{breachCount} breach{breachCount === 1 ? "" : "es"} confirmed</strong> — your email has been exposed in known breach databases</span>
-                                </div>
-                              )}
-                              {pendingBrokers > 0 && (
-                                <div className="flex items-start gap-2 text-sm text-slate-300">
-                                  <span className="text-yellow-400 mt-0.5 shrink-0">&#9711;</span>
-                                  <span><strong className="text-white">{pendingBrokers} sites could not be fully checked</strong> — continuous monitoring catches what a one-time scan misses</span>
-                                </div>
-                              )}
-                              <div className="flex items-start gap-2 text-sm text-slate-300">
-                                <span className="text-teal-400 mt-0.5 shrink-0">&#8635;</span>
-                                <span>New exposures happen <strong className="text-white">every day</strong> — this result reflects today only</span>
-                              </div>
-                            </div>
+                <div className={cn(
+                  "px-6 py-4 flex items-center gap-3 border-b",
+                  report?.exposureScore === "critical" ? "bg-red-900/60 border-red-700/50" :
+                  report?.exposureScore === "high" ? "bg-orange-900/50 border-orange-700/50" :
+                  report?.exposureScore === "medium" ? "bg-yellow-900/40 border-yellow-700/40" :
+                  "bg-teal-900/30 border-teal-700/30"
+                )}>
+                  <div className={cn(
+                    "w-2.5 h-2.5 rounded-full animate-pulse",
+                    report?.exposureScore === "critical" ? "bg-red-400" :
+                    report?.exposureScore === "high" ? "bg-orange-400" :
+                    report?.exposureScore === "medium" ? "bg-yellow-400" : "bg-teal-400"
+                  )} />
+                  <span className="text-xs font-semibold uppercase tracking-widest text-slate-300">
+                    {report?.exposureScore === "critical" ? "CRITICAL RISK — Immediate action recommended" :
+                     report?.exposureScore === "high" ? "HIGH EXPOSURE — Your data is actively circulating" :
+                     report?.exposureScore === "medium" ? "MEDIUM RISK — Evolving threats detected" :
+                     "LOW RISK — Threats change. Stay ahead of them."}
+                  </span>
+                </div>
+                <div className="px-6 py-8">
+                  <div className="grid md:grid-cols-2 gap-8 items-start">
+                    <div>
+                      <h3 className="text-2xl font-bold text-white mb-3 leading-tight">
+                        {report?.exposureScore === "critical" ? "Your personal data is severely exposed." :
+                         report?.exposureScore === "high" ? "Your data is out there. And it is being used." :
+                         report?.exposureScore === "medium" ? "Some exposure found. More may emerge." :
+                         "Clean for now — but threats do not stand still."}
+                      </h3>
+                      <p className="text-slate-300 text-sm mb-5 leading-relaxed">
+                        {(report?.exposureScore === "critical" || report?.exposureScore === "high") && (
+                          <span>
+                            Your information was found on data broker sites and in confirmed breaches.
+                            This data is actively used for identity theft, targeted phishing, and financial fraud.
+                            Continuous removal and monitoring are essential.
+                          </span>
+                        )}
+                        {report?.exposureScore === "medium" && (
+                          <span>
+                            Some exposure was found in your scan. Similar patterns appear in scams targeting people with your profile.
+                            Threats evolve — what looks clean today can surface tomorrow.
+                          </span>
+                        )}
+                        {(!report?.exposureScore || report?.exposureScore === "low") && (
+                          <span>
+                            This scan found minimal exposure, which is genuinely good news.
+                            But data broker listings and breaches appear daily.
+                            A clean result today does not guarantee a clean result next month.
+                          </span>
+                        )}
+                      </p>
+                      <div className="space-y-2.5 mb-4">
+                        {(report?.brokerResults?.filter(b => b.status === "found").length ?? 0) > 0 && (
+                          <div className="flex items-start gap-2 text-sm text-slate-300">
+                            <span className="text-orange-400 mt-0.5 shrink-0 font-bold">!</span>
+                            <span>
+                              <strong className="text-white">
+                                {report!.brokerResults.filter(b => b.status === "found").length} data broker {report!.brokerResults.filter(b => b.status === "found").length === 1 ? "site has" : "sites have"} your profile
+                              </strong>
+                              {" "}— your data is listed and sold to anyone who pays
+                            </span>
                           </div>
-                          <div className="bg-slate-800/60 rounded-2xl border border-slate-700/60 p-6">
-                            <div className="text-center mb-5">
-                              <div className="inline-flex items-center gap-1.5 bg-teal-500/15 border border-teal-500/30 rounded-full px-3 py-1 mb-3">
-                                <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse" />
-                                <span className="text-teal-300 text-xs font-semibold tracking-wide">CONTINUOUS PROTECTION</span>
-                              </div>
-                              <h4 className="text-white font-bold text-lg mb-1">GCR Data Shield Protection</h4>
-                              <p className="text-slate-400 text-xs">Monthly re-scans · Auto removal · Breach alerts</p>
-                            </div>
-                            <div className="text-center mb-5">
-                              <div className="flex items-end justify-center gap-1 mb-1">
-                                <span className="text-slate-400 text-sm mb-1">from</span>
-                                <span className="text-4xl font-black text-white">$8.99</span>
-                                <span className="text-slate-400 text-sm mb-1">/mo</span>
-                              </div>
-                              <p className="text-slate-500 text-xs">or $83.88/year · Cancel anytime</p>
-                            </div>
-                            <ul className="space-y-2 mb-6 text-sm">
-                              {[
-                                "Monthly full re-scan across 500+ broker sites",
-                                "Automatic opt-out submissions on your behalf",
-                                "Real-time breach alerts when your email appears",
-                                "Removal verification — we confirm it worked",
-                              ].map((feature) => (
-                                <li key={feature} className="flex items-start gap-2 text-slate-300">
-                                  <span className="text-teal-400 shrink-0 mt-0.5">&#10003;</span>
-                                  <span>{feature}</span>
-                                </li>
-                              ))}
-                            </ul>
-                            <Link href="/data-shield-pricing">
-                              <Button className={cn("w-full text-sm font-bold py-3 rounded-xl transition-all duration-200 shadow-lg", ctaBg)}>
-                                {ctaLabel}
-                                <span className="ml-2">&#8594;</span>
-                              </Button>
-                            </Link>
-                            <p className="text-center text-xs text-slate-500 mt-3">
-                              Free check access remains. Protection is optional.
-                            </p>
+                        )}
+                        {(report?.breachResults?.filter(b => !b.breachName?.startsWith("__")).length ?? 0) > 0 && (
+                          <div className="flex items-start gap-2 text-sm text-slate-300">
+                            <span className="text-red-400 mt-0.5 shrink-0 font-bold">!</span>
+                            <span>
+                              <strong className="text-white">
+                                {report!.breachResults.filter(b => !b.breachName?.startsWith("__")).length} confirmed breach{report!.breachResults.filter(b => !b.breachName?.startsWith("__")).length === 1 ? "" : "es"}
+                              </strong>
+                              {" "}— your email has been exposed in known breach databases
+                            </span>
                           </div>
-                        </div>
-                        <div className="flex flex-col sm:flex-row gap-3 justify-center mt-6 pt-6 border-t border-slate-700/50">
-                          <Link href={nextStepsHref}>
-                            <Button variant="outline" size="sm" className="border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white">
-                              View your removal action plan
-                            </Button>
-                          </Link>
-                          <Link href="/shield">
-                            <Button variant="ghost" size="sm" className="text-slate-400 hover:text-slate-200">
-                              Run another scan
-                            </Button>
-                          </Link>
+                        )}
+                        <div className="flex items-start gap-2 text-sm text-slate-300">
+                          <span className="text-teal-400 mt-0.5 shrink-0">+</span>
+                          <span>New exposures happen <strong className="text-white">every day</strong> — this result reflects today only</span>
                         </div>
                       </div>
-                    </>
-                  );
-                })()}
+                    </div>
+                    <div className="rounded-2xl border border-slate-700/60 p-6" style={{background: "rgba(30,41,59,0.6)"}}>
+                      <div className="text-center mb-5">
+                        <div className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 mb-3 border" style={{background: "rgba(20,184,166,0.1)", borderColor: "rgba(20,184,166,0.3)"}}>
+                          <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse" />
+                          <span className="text-teal-300 text-xs font-semibold tracking-wide">CONTINUOUS PROTECTION</span>
+                        </div>
+                        <h4 className="text-white font-bold text-lg mb-1">GCR Data Shield Protection</h4>
+                        <p className="text-slate-400 text-xs">Monthly re-scans · Auto removal · Breach alerts</p>
+                      </div>
+                      <div className="text-center mb-5">
+                        <div className="flex items-end justify-center gap-1 mb-1">
+                          <span className="text-slate-400 text-sm mb-1">from</span>
+                          <span className="text-4xl font-black text-white">$8.99</span>
+                          <span className="text-slate-400 text-sm mb-1">/mo</span>
+                        </div>
+                        <p className="text-slate-500 text-xs">or $83.88/year — Cancel anytime</p>
+                      </div>
+                      <ul className="space-y-2 mb-6 text-sm">
+                        <li className="flex items-start gap-2 text-slate-300">
+                          <span className="text-teal-400 shrink-0">+</span>
+                          <span>Monthly full re-scan across 500+ broker sites</span>
+                        </li>
+                        <li className="flex items-start gap-2 text-slate-300">
+                          <span className="text-teal-400 shrink-0">+</span>
+                          <span>Automatic opt-out submissions on your behalf</span>
+                        </li>
+                        <li className="flex items-start gap-2 text-slate-300">
+                          <span className="text-teal-400 shrink-0">+</span>
+                          <span>Real-time breach alerts when your email appears</span>
+                        </li>
+                        <li className="flex items-start gap-2 text-slate-300">
+                          <span className="text-teal-400 shrink-0">+</span>
+                          <span>Removal verification — we confirm it worked</span>
+                        </li>
+                      </ul>
+                      <Link href="/data-shield-pricing">
+                        <Button className={cn(
+                          "w-full text-sm font-bold py-3 rounded-xl transition-all duration-200 shadow-lg",
+                          (report?.exposureScore === "high" || report?.exposureScore === "critical")
+                            ? "bg-orange-500 hover:bg-orange-400 text-white"
+                            : "bg-teal-500 hover:bg-teal-400 text-white"
+                        )}>
+                          {(report?.exposureScore === "high" || report?.exposureScore === "critical")
+                            ? "Activate protection now" : "Start continuous protection"}
+                          <span className="ml-2">&#8594;</span>
+                        </Button>
+                      </Link>
+                      <p className="text-center text-xs text-slate-500 mt-3">
+                        Free check access remains. Protection is optional.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center mt-6 pt-6 border-t border-slate-700/50">
+                    <Link href={"/shield/next-steps?level=" + (report?.exposureScore || "high")}>
+                      <Button variant="outline" size="sm" className="border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white">
+                        View your removal action plan
+                      </Button>
+                    </Link>
+                    <Link href="/shield">
+                      <Button variant="ghost" size="sm" className="text-slate-400 hover:text-slate-200">
+                        Run another scan
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
               </CardContent>
             </Card>
+          )}
         </div>
       </main>
       <Footer />
