@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import PageContent from "@pages/gcr-guard-pricing";
+import PageContent from "@/pages/gcr-guard-pricing";
 
 export const dynamic = "force-dynamic";
 
