@@ -1,11 +1,5 @@
-import type { Metadata } from "next";
-import PageContent from "@pages/checkout-success";
-
-export const metadata: Metadata = {
-  title: "Welcome to GetCyberRight Protection",
-  robots: { index: false, follow: false },
-};
+import { redirect } from "next/navigation";
 
 export default function CheckoutSuccessPage() {
-  return <PageContent />;
+  redirect("/dashboard?welcome=true");
 }
