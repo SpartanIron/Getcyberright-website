@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import PageContent from "@pages/data-shield-pricing";
+import PageContent from "@/pages/data-shield-pricing";
 
 export const dynamic = "force-dynamic";
 
