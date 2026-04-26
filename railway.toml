@@ -3,7 +3,7 @@ builder = "RAILPACK"
 buildCommand = "npm run build"
 
 [deploy]
-releaseCommand = "npm run migrate"
+releaseCommand = "npm run db:migrate"
 startCommand = "npm start"
 healthcheckPath = "/"
 healthcheckTimeout = 300
