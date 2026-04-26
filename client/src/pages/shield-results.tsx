@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
-import { cn } from "@/lib/utils";
   Shield,
   AlertTriangle,
   CheckCircle2,
@@ -37,6 +36,7 @@ import { cn } from "@/lib/utils";
   Lock,
   ShieldCheck,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type BrokerResult = {
   broker: string | null;
