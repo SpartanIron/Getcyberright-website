@@ -65,6 +65,17 @@ const nextConfig = {
                       destination: '/cyber-threat-radar',
                       permanent: false,
             },
+                      // SEO fixes: redirect deprecated/404 URLs to canonical pages
+              {
+                              source: '/learning-path',
+                              destination: '/training',
+                              permanent: true,
+              },
+              {
+                              source: '/trend-:id*',
+                              destination: '/cyber-threat-radar',
+                              permanent: true,
+              },
                 ];
     },
 
