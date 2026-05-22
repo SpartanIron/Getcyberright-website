@@ -18,7 +18,7 @@ export const initGA = () => {
 
   const measurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || "";
   if (!measurementId) {
-    console.warn('Missing required Google Analytics key: VITE_GA_MEASUREMENT_ID');
+          console.warn('Missing required Google Analytics key: NEXT_PUBLIC_GA_MEASUREMENT_ID');
     return;
   }
 
