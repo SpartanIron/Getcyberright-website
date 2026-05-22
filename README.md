@@ -23,7 +23,7 @@ GetCyberRight is a free, accessible platform providing AI-powered scam detection
 
 | Layer | Technology |
 |-------|------------|
-| Frontend | React, TypeScript, Vite, TailwindCSS, shadcn/ui |
+| Frontend | Next.js 15, TypeScript, TailwindCSS, shadcn/ui |
 | Backend | Node.js, Express, TypeScript |
 | Database | PostgreSQL (Neon serverless) |
 | ORM | Drizzle ORM |
@@ -94,7 +94,7 @@ The application will be available at `http://localhost:5000`
 
 | Variable | Description |
 |----------|-------------|
-| `SESSION_SECRET` | Session cookie signing (recommended for Replit Auth) |
+| `SESSION_SECRET` | Session cookie signing (recommended for production) |
 | `NEWS_API_KEY` | News API key (optional, enhances news aggregation) |
 
 ### Optional Environment Variables
@@ -106,7 +106,7 @@ The application will be available at `http://localhost:5000`
 | `JWT_EXPIRES_IN` | 8h | JWT token expiration |
 | `REFRESH_TOKEN_EXPIRES_IN` | 7d | Refresh token expiration |
 | `BASE_URL` | https://getcyberright.com | Site base URL |
-| `VITE_RECAPTCHA_SITE_KEY` | - | reCAPTCHA site key |
+| `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` | - | reCAPTCHA site key |
 
 ### Email Service Configuration (at least one required for email features)
 
@@ -118,11 +118,11 @@ The application will be available at `http://localhost:5000`
 
 ## Deployment
 
-### Replit Deployment
+### Railway Deployment
 
-1. Ensure all required secrets are configured in Replit Secrets
-2. Click "Deploy" or use Replit's publish feature
-3. The application automatically handles:
+1. Set `NEXT_PUBLIC_GA_MEASUREMENT_ID` and all other required env vars in Railway service Variables
+2. Connect your GitHub repo to the Railway service (Settings → Source)
+3. Push to main branch — Railway auto-deploys and handles:
    - Building the frontend
    - Starting the production server
    - TLS/SSL certificates
