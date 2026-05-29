@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 const BASE_URL = "https://www.getcyberright.com";
 
 export const metadata: Metadata = {
-  title: "News & Insights | Cybersecurity Updates for Families | GetCyberRight",
+  title: "Cybersecurity News & Insights for Families | GetCyberRight",
   description:
     "Stay informed with the latest cybersecurity news, threat intelligence, AI safety insights, learning opportunities, and security advisories. Expert analysis curated for families.",
   alternates: {
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "News & Insights | Cybersecurity Updates for Families | GetCyberRight",
+    title: "Cybersecurity News & Insights for Families | GetCyberRight",
     description:
       "Stay informed with the latest cybersecurity news, threat intelligence, AI safety insights, learning opportunities, and security advisories. Expert analysis curated for families.",
     url: `${BASE_URL}/news`,

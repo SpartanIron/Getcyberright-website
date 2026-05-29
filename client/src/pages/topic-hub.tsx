@@ -52,24 +52,24 @@ const CLUSTER_COLORS: Record<string, string> = {
   "social-media-security": "bg-teal-50 border-teal-200 dark:bg-teal-950/20 dark:border-teal-800",
 };
 
-export default function TopicHub() {
+export default function TopicHub({ initialGuides, initialScamIntel, initialAlerts }: { initialGuides?: any[]; initialScamIntel?: any[]; initialAlerts?: any[] } = {}) {
   const params = useParams<{ cluster: string }>();
   const cluster = params.cluster as string;
   const clusterLabel = CLUSTER_LABELS[cluster as SEOCluster] || cluster;
   const isValid = SEO_CLUSTERS.includes(cluster as SEOCluster);
 
   const { data: guides, isLoading: guidesLoading } = useQuery<any[]>({
-    queryKey: ["/api/guides", "published"],
+    queryKey: ["/api/guides", "published"],    initialData: initialGuides?.length ? initialGuides : undefined,
     enabled: isValid,
   });
 
   const { data: scamIntel, isLoading: scamIntelLoading } = useQuery<any[]>({
-    queryKey: ["/api/scam-intel", "published"],
+    queryKey: ["/api/scam-intel", "published"],    initialData: initialScamIntel?.length ? initialScamIntel : undefined,
     enabled: isValid,
   });
 
   const { data: alerts, isLoading: alertsLoading } = useQuery<any[]>({
-    queryKey: ["/api/threat-alerts", "published"],
+    queryKey: ["/api/threat-alerts", "published"],    initialData: initialAlerts?.length ? initialAlerts : undefined,
     enabled: isValid,
   });
 

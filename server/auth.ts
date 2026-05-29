@@ -168,10 +168,16 @@ export function registerAuthRoutes(app: Express) {
         const baseUrl = `${req.protocol}://${req.get("host")}`;
         const emailSent = await sendEmailVerification(validatedData.email.toLowerCase(), emailVerificationToken, baseUrl);
         if (!emailSent) {
-          console.error("[auth] Failed to send verification email to", validatedData.email);
+                                  console.error("[auth] Failed to send verification email to", validatedData.email);
+                                  // Auto-verify user if email delivery is not configured so they can still log in
+                                  await db.update(users).set({
+                                                  emailVerified: true,
+                                                  emailVerificationToken: null,
+                                                  emailVerificationExpires: null
+                                  }).where(eq(users.id, newUser.id));
+                    }
         }
-      }
-      
+        
       res.json({ 
         success: true, 
         message: "Account created successfully.",

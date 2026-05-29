@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "Data Breach Monitor | GetCyberRight",
   description: "Monitor your email addresses for data breaches. Get instant alerts when your personal information appears in known data breaches.",
   alternates: { canonical: `${BASE_URL}/breach-dashboard` },
-  openGraph: {
+  robots: { index: false, follow: false },  openGraph: {
     title: "Data Breach Monitor | GetCyberRight",
     description: "Monitor your email addresses for data breaches. Get instant alerts when your personal information appears in known data breaches.",
     url: `${BASE_URL}/breach-dashboard`,

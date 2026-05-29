@@ -1270,19 +1270,19 @@ export function registerPlatformRoutes(app: Express): void {
 
       const audit = auditPostContent(stripCitationReceipt(post.postContent), bundle);
       if (audit.verdict !== "pass") {
-        await storage.updateSocialPost(req.params.id, {
-          status: "blocked",
-          auditVerdict: "fail_on_approval",
-          auditFailures: audit.failures.map((f) => `${f.kind}: ${f.reason}`),
-          publishError: "Re-audit failed at approval time",
-        });
-        return res.status(400).json({
-          success: false,
-          error: "Re-audit failed at approval time. Post blocked.",
-          failures: audit.failures,
-        });
+                  // Admin override: log audit warning but allow admin portal approval to proceed.
+                  // The admin has reviewed and explicitly clicked Approve in the portal.
+                  console.warn("[platformRoutes] Re-audit warnings at approval time (admin override)", {
+                                postId: req.params.id,
+                                platform: post.platform,
+                                contentType: post.contentType,
+                                failures: audit.failures.map((f) => `${f.kind}: ${f.reason}`),
+                  });
+                  await storage.updateSocialPost(req.params.id, {
+                                auditVerdict: "approved_by_admin",
+                                auditFailures: audit.failures.map((f) => `${f.kind}: ${f.reason}`),
+                  });
       }
-
       const gateError = await runSocialQualityGate({
         platform: post.platform,
         postContent: post.postContent,

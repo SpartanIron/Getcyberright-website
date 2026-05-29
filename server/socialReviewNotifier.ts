@@ -601,7 +601,6 @@ export async function executeReviewAction(postId: string, action: ReviewAction):
         detail,
       };
     }
-
     const gateError = await runSocialQualityGate({
       platform: post.platform,
       postContent: post.postContent,

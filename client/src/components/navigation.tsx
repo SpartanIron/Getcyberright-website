@@ -63,6 +63,7 @@ const learnTopics = [
   { title: "Phishing & Email Scams", href: "/resources?category=phishing", icon: AlertTriangle },
   { title: "Online Privacy", href: "/resources?category=privacy", icon: Lock },
   { title: "Resource Library", href: "/resources", icon: FileText },
+  { title: "Recommended Tools", href: "/recommended-tools", icon: Shield },
 ];
 
 export function Navigation() {

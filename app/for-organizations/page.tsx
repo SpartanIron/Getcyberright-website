@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: "For Organizations | GetCyberRight",
   description:
     "Cybersecurity training, threat briefings, and safety tools for schools, businesses, governments, and community organizations. Designed for non-technical audiences.",
-  openGraph: {
+  alternates: { canonical: "https://www.getcyberright.com/for-organizations" },  openGraph: {
     title: "For Organizations | GetCyberRight",
     description:
       "Cybersecurity training, threat briefings, and safety tools for schools, businesses, governments, and community organizations.",

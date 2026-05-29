@@ -5,6 +5,7 @@ import compression from "compression";
 import { runMigrations } from "./migrate";
 import { seedNewsArticles } from "./newsSeedArticles";
 import { registerRoutes } from "./routes";
+import { registerHIBPRoutes } from "./hibp-routes";
 import { createServer } from "http";
 import {
   configureHelmet,
@@ -187,6 +188,8 @@ async function bootstrapFullApp() {
       next();
     });
 
+      await registerRoutes(httpServer, app);
+
     app.use((req, res, next) => {
       const start = Date.now();
       const reqPath = req.path;
@@ -230,6 +233,7 @@ async function bootstrapFullApp() {
       const { startFreshnessMonitor } = await import("./sourceFreshnessMonitor");
       const { COUNTRY_CITATIONS } = await import("./scamIntelAggregator");
       const seen = new Set<string>();
+        registerHIBPRoutes(app);
       const flat: Array<{ url: string; publisher: string; country: string; citationName: string; tier?: "A" | "B" | "C" }> = [];
       for (const [country, list] of Object.entries(COUNTRY_CITATIONS)) {
         for (const c of list) {

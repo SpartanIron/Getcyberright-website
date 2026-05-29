@@ -5,11 +5,11 @@ import PageContent from "@/pages/password-generator";
 const BASE_URL = "https://www.getcyberright.com";
 
 export const metadata: Metadata = {
-  title: "Free Secure Password Generator: Create Strong Passwords | GetCyberRight",
+  title: "Free Password Generator: Create Strong Passwords | GetCyberRight",
   description: "Generate strong, unique passwords instantly. Customize length, character types, and complexity. Free to use, no account required. Runs entirely in your browser.",
   alternates: { canonical: `${BASE_URL}/password-generator` },
   openGraph: {
-    title: "Free Secure Password Generator: Create Strong Passwords | GetCyberRight",
+    title: "Free Password Generator: Create Strong Passwords | GetCyberRight",
     description: "Generate strong, unique passwords instantly. Customize length, character types, and complexity. Free to use, no account required.",
     url: `${BASE_URL}/password-generator`,
     type: "website",

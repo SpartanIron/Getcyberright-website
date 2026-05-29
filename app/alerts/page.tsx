@@ -4,6 +4,7 @@ import PageContent from "@/pages/alerts-listing";
 import { getThreatAlerts } from "../lib/data";
 
 const BASE_URL = "https://www.getcyberright.com";
+const API_BASE = `http://localhost:${process.env.PORT || 5000}`;
 
 export const metadata: Metadata = {
   title: "Cyber Threat Alerts | GetCyberRight",

@@ -177,10 +177,11 @@ function applyCancellation(product: ProductType) {
   };
 }
 
-export function registerStripeRoutes(app: Express) {
-  if (!STRIPE_SECRET_KEY) {
-    console.log("Stripe routes skipped: STRIPE_SECRET_KEY not set");
-    return;
+  export function registerStripeRoutes(app: Express) {
+    // Register all routes but return 503 if Stripe is not yet configured
+  const stripeConfigured = !!STRIPE_SECRET_KEY;
+  if (!stripeConfigured) {
+        console.log("Stripe routes registered in degraded mode: STRIPE_SECRET_KEY not set");
   }
 
   app.post("/api/stripe/create-checkout", isAuthenticated, async (req: any, res: Response) => {
@@ -188,6 +189,9 @@ export function registerStripeRoutes(app: Express) {
       if (isFreeAccessPeriod()) {
         return res.status(400).json({ error: "All features are currently free! No payment needed." });
       }
+        if (!stripeConfigured) {
+                    return res.status(503).json({ error: "Payment processing is not yet configured. Please contact support or try again later." });
+        }
       const s = getStripe();
       const user = req.user;
       const { planId, returnPath } = req.body;

@@ -47,7 +47,7 @@ const typeConfig: Record<string, { icon: typeof Megaphone; accent: string; dot: 
     dot: "bg-emerald-400",
   },
   update: {
-    icon: Megaphone,
+icon: Megaphone,
     accent: "text-sky-300",
     dot: "bg-sky-400",
   },
@@ -88,7 +88,7 @@ export function AnnouncementBanner() {
   };
 
   const handleDismissAll = () => {
-    dismissAllAnnouncements();
+    try { localStorage.setItem(DISMISS_ALL_KEY, "true"); } catch {}
     setAllDismissed(true);
   };
 
