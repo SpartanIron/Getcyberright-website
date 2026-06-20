@@ -72,7 +72,7 @@ const nextConfig = {
                               permanent: true,
               },
               {
-                              source: '/trend-:id*',
+                              source: '/trend-:id',
                               destination: '/cyber-threat-radar',
                               permanent: true,
               },

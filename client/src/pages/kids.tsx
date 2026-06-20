@@ -665,6 +665,14 @@ const ageGroupConfig = {
 };
 
 
+const KIDS_TAB_LABELS: Record<ActiveTab, string> = {
+  "new-reality": "Start Here",
+  "old-advice": "What Changed",
+  "proactive": "Lessons",
+  "real-time": "Practice",
+  "tradeoffs": "Good to Know",
+};
+
 function CollapsibleSteps({ steps, platform }: { steps: string[]; platform: string }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const previewCount = 3;
@@ -697,7 +705,7 @@ function LearningTrack({
   onBack: () => void;
 }) {
   const [activeModule, setActiveModule] = useState<ActiveModule>(null);
-  const [activeTab, setActiveTab] = useState<ActiveTab>("new-reality");
+  const [activeTab, setActiveTab] = useState<ActiveTab>("proactive");
   const [progress, setProgress] = useState(loadProgress());
 
   const config = ageGroupConfig[ageGroup];
@@ -782,7 +790,7 @@ function LearningTrack({
             <TabsList className="flex flex-wrap h-auto gap-1.5 bg-muted/50 p-1.5 rounded-xl mb-6 w-full">
               {PILLARS.map((p) => (
                 <TabsTrigger key={p.id} value={p.id} className="flex items-center gap-1.5 px-3 py-2" data-testid={`tab-pillar-${p.id}`}>
-                  <p.icon className="w-4 h-4" /> {p.shortLabel}
+                  <p.icon className="w-4 h-4" /> {KIDS_TAB_LABELS[p.id]}
                 </TabsTrigger>
               ))}
             </TabsList>
