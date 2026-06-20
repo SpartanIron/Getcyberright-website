@@ -1,28 +1,5 @@
 import path from "path";
-import { fileURLToPath } from "url";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-    reactStrictMode: false,  typescript: { ignoreBuildErrors: true },
-
-    async redirects() {
-          return [
-            {
-                      source: '/partner-with-us',
-                      destination: '/advertise',
-                      permanent: true,
-            },
-            {
-                      source: '/scam-guard',
-                      destination: '/scam-checker',
-                      permanent: true,
-            },
-            {
-                      source: '/educate',
-                      destination: '/educators',
-                      permanent: true,
+                      permanent: true,h
             },
             {
                       source: '/protection-hub',
@@ -72,7 +49,7 @@ const nextConfig = {
                               permanent: true,
               },
               {
-                              source: '/trend-:id*',
+                              source: '/trend-:slug*',
                               destination: '/cyber-threat-radar',
                               permanent: true,
               },
@@ -123,11 +100,3 @@ const nextConfig = {
           config.resolve.alias = {
                   ...config.resolve.alias,
                   "@": path.resolve(__dirname, "client", "src"),
-                  "@shared": path.resolve(__dirname, "shared"),
-                  "@assets": path.resolve(__dirname, "attached_assets"),
-          };
-          return config;
-    },
-};
-
-export default nextConfig;
