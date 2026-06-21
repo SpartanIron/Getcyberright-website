@@ -34,6 +34,7 @@ import { z } from "zod";
 import { Mail, Phone, Clock, Send, CheckCircle2, MapPin } from "lucide-react";
 import bannerImage from "@/assets/banners/contact-banner.webp";
 import { imgSrc } from "@/lib/img-src";
+import { AfterHoursCallbackBanner } from "@/components/after-hours-callback";
 
 const contactMethods = [
   {
@@ -141,6 +142,7 @@ export function ContactContent() {
                 </FadeIn>
               ))}
             </div>
+                        <AfterHoursCallbackBanner />
 
             <div className="grid lg:grid-cols-2 gap-12">
               <FadeIn>
