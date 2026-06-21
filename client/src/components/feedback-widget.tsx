@@ -5,7 +5,6 @@ import { MessageSquarePlus, X, Send, Bug, Lightbulb, HelpCircle, Star, FileText 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
 import { useFeedbackTriage } from "@/components/feedback-triage";
 
 const categories = [
@@ -23,28 +22,26 @@ const [isOpen, setIsOpen] = useState(false);
 const [category, setCategory] = useState<Category | null>(null);
 const [message, setMessage] = useState("");
 const [email, setEmail] = useState("");
-const { toast } = useToast();
-const { submitTriage, isPending } = useFeedbackTriage({
-  onSuccess: () => {
-    toast({ title: "Thank you!", description: "Your feedback has been submitted. We appreciate you helping us improve." });
-    setIsOpen(false);
-    setCategory(null);
-    setMessage("");
-    setEmail("");
-  },
-  onError: () => {
-    toast({ title: "Something went wrong", description: "Please try again later.", variant: "destructive" });
-  },
-});
+const { submitMutation } = useFeedbackTriage();
 
 const handleSubmit = () => {
   if (!category || !message.trim()) return;
-  submitTriage({
-    category,
-    message: message.trim(),
-    email: email.trim(),
-    page: window.location.pathname,
-  });
+  submitMutation.mutate(
+    {
+      category,
+      message: message.trim(),
+      email: email.trim(),
+      page: window.location.pathname,
+    },
+    {
+      onSuccess: () => {
+        setIsOpen(false);
+        setCategory(null);
+        setMessage("");
+        setEmail("");
+      },
+    }
+  );
 };
 
 if (!isOpen) {
@@ -142,11 +139,11 @@ return (
 
           <Button
             onClick={handleSubmit}
-            disabled={!message.trim() || message.trim().length < 5 || isPending}
+            disabled={!message.trim() || message.trim().length < 5 || submitMutation.isPending}
             className="w-full bg-teal-600 hover:bg-teal-700"
             data-testid="button-submit-feedback"
           >
-            {isPending ? (
+            {submitMutation.isPending ? (
               "Submitting..."
             ) : (
               <>
@@ -160,4 +157,4 @@ return (
     </div>
   </div>
 );
-}
+      }
