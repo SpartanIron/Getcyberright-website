@@ -311,6 +311,17 @@ export function Navigation() {
                   </Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuLink asChild>
+                  <Link
+                    href="/you-asked-we-did"
+                    className={`group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-3 py-2 text-sm font-medium transition-colors focus:outline-none hover-elevate text-white/90 hover:text-white ${location === '/you-asked-we-did' ? 'text-primary' : ''}`}
+                    data-testid="nav-you-asked-we-did"
+                  >
+                    You Asked, We Did
+                  </Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
 
@@ -445,6 +456,14 @@ export function Navigation() {
                     data-testid="mobile-link-contact"
                   >
                     Contact
+                  </Link>
+                  <Link
+                    href="/you-asked-we-did"
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                    data-testid="mobile-link-you-asked-we-did"
+                  >
+                    You Asked, We Did
                   </Link>
                 </div>
 
