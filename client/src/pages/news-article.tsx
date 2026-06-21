@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   ArrowLeft, Clock, ExternalLink, Shield, AlertTriangle, Loader2, User,
   Tag, CheckCircle2, MessageSquare, Send, Trash2, Mail, Facebook, Linkedin, Link2, Check,
-  ChevronRight, Home, Sparkles,
+  ChevronRight, Home, Sparkles, BadgeCheck, Reply,
 } from "lucide-react";
 import { SiX, SiReddit, SiWhatsapp, SiFlipboard } from "react-icons/si";
 import { Navigation } from "@/components/navigation";
@@ -72,6 +72,8 @@ interface CommentItem {
   userId: string;
   authorName: string;
   content: string;
+  parentId?: string | null;
+  isTeamReply?: boolean;
   createdAt: string;
 }
 
@@ -271,8 +273,72 @@ function NewsletterInline({
   );
 }
 
+function CommentRow({
+  comment,
+  isReply,
+  canModerate,
+  canReply,
+  isAdmin,
+  onDelete,
+  onReply,
+}: {
+  comment: CommentItem;
+  isReply: boolean;
+  canModerate: boolean;
+  canReply: boolean;
+  isAdmin: boolean;
+  onDelete: (id: string) => void;
+  onReply: (id: string) => void;
+}) {
+  const isTeam = !!comment.isTeamReply;
+  return (
+    <div className="flex gap-3" data-testid={`comment-${comment.id}`}>
+      <Avatar className={`${isReply ? "w-7 h-7" : "w-9 h-9"} flex-shrink-0`}>
+        <AvatarFallback className={`text-xs font-semibold ${isTeam ? "bg-teal-600 text-white" : "bg-primary/10 text-primary"}`}>
+          {isTeam ? "GC" : getInitials(comment.authorName)}
+        </AvatarFallback>
+      </Avatar>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 mb-1 flex-wrap">
+          <span className="text-sm font-semibold">{comment.authorName}</span>
+          {isTeam && (
+            <Badge className="bg-teal-600 text-white hover:bg-teal-600 gap-1 px-1.5 py-0 text-[10px]" data-testid={`badge-team-${comment.id}`}>
+              <BadgeCheck className="h-3 w-3" />
+              Verified Team
+            </Badge>
+          )}
+          <span className="text-xs text-muted-foreground">{formatRelative(comment.createdAt)}</span>
+          {canModerate && (
+            <button
+              onClick={() => onDelete(comment.id)}
+              className="ml-auto text-muted-foreground hover:text-red-600 transition-colors"
+              aria-label="Delete comment"
+              data-testid={`delete-comment-${comment.id}`}
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </div>
+        <p className="text-sm text-foreground/90 whitespace-pre-wrap break-words">{comment.content}</p>
+        {canReply && (
+          <button
+            onClick={() => onReply(comment.id)}
+            className="mt-1.5 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+            data-testid={`button-reply-${comment.id}`}
+          >
+            <Reply className="h-3 w-3" />
+            {isAdmin ? "Reply as Team" : "Reply"}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function CommentsSection({ slug }: { slug: string }) {
   const [content, setContent] = useState("");
+  const [replyTo, setReplyTo] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState("");
   const { toast } = useToast();
   const qc = useQueryClient();
 
@@ -294,14 +360,20 @@ function CommentsSection({ slug }: { slug: string }) {
   });
 
   const postMutation = useMutation({
-    mutationFn: async (text: string) => {
-      const res = await apiRequest("POST", `/api/news/article/${slug}/comments`, { content: text });
+    mutationFn: async ({ text, parentId }: { text: string; parentId?: string | null }) => {
+      const res = await apiRequest("POST", `/api/news/article/${slug}/comments`, { content: text, parentId: parentId ?? undefined });
       return res.json();
     },
-    onSuccess: () => {
-      setContent("");
+    onSuccess: (_data, vars) => {
+      if (vars.parentId) {
+        setReplyText("");
+        setReplyTo(null);
+        toast({ title: "Reply posted" });
+      } else {
+        setContent("");
+        toast({ title: "Comment posted" });
+      }
       qc.invalidateQueries({ queryKey: ["/api/news/article", slug, "comments"] });
-      toast({ title: "Comment posted" });
     },
     onError: (err: any) => {
       toast({ title: "Couldn't post", description: err?.message || "Please try again.", variant: "destructive" });
@@ -316,6 +388,13 @@ function CommentsSection({ slug }: { slug: string }) {
   });
 
   const comments = data?.comments || [];
+  const topLevel = comments.filter(c => !c.parentId);
+  const repliesByParent = comments.reduce<Record<string, CommentItem[]>>((acc, c) => {
+    if (c.parentId) (acc[c.parentId] = acc[c.parentId] || []).push(c);
+    return acc;
+  }, {});
+
+  const canModerate = (c: CommentItem) => isAdmin || (!!myUserId && c.userId === myUserId);
 
   return (
     <Card className="mt-8" data-testid="comments-section">
@@ -328,7 +407,7 @@ function CommentsSection({ slug }: { slug: string }) {
 
         {me ? (
           <form
-            onSubmit={(e) => { e.preventDefault(); if (content.trim().length >= 2) postMutation.mutate(content.trim()); }}
+            onSubmit={(e) => { e.preventDefault(); if (content.trim().length >= 2) postMutation.mutate({ text: content.trim() }); }}
             className="mb-6"
           >
             <Textarea
@@ -348,7 +427,7 @@ function CommentsSection({ slug }: { slug: string }) {
                 disabled={postMutation.isPending || content.trim().length < 2}
                 data-testid="button-post-comment"
               >
-                {postMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Send className="h-3.5 w-3.5 mr-1.5" />Post</>}
+                {postMutation.isPending && !replyTo ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Send className="h-3.5 w-3.5 mr-1.5" />Post</>}
               </Button>
             </div>
           </form>
@@ -363,34 +442,63 @@ function CommentsSection({ slug }: { slug: string }) {
 
         {isLoading ? (
           <div className="flex justify-center py-6"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
-        ) : comments.length === 0 ? (
+        ) : topLevel.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-6">No comments yet. Be the first to share your perspective.</p>
         ) : (
-          <div className="space-y-4">
-            {comments.map(c => (
-              <div key={c.id} className="flex gap-3" data-testid={`comment-${c.id}`}>
-                <Avatar className="w-9 h-9 flex-shrink-0">
-                  <AvatarFallback className="text-xs bg-primary/10 text-primary font-semibold">
-                    {getInitials(c.authorName)}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-sm font-semibold">{c.authorName}</span>
-                    <span className="text-xs text-muted-foreground">{formatRelative(c.createdAt)}</span>
-                    {(isAdmin || (myUserId && c.userId === myUserId)) && (
-                      <button
-                        onClick={() => deleteMutation.mutate(c.id)}
-                        className="ml-auto text-muted-foreground hover:text-red-600 transition-colors"
-                        aria-label="Delete comment"
-                        data-testid={`delete-comment-${c.id}`}
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    )}
+          <div className="space-y-5">
+            {topLevel.map(c => (
+              <div key={c.id}>
+                <CommentRow
+                  comment={c}
+                  isReply={false}
+                  canModerate={canModerate(c)}
+                  canReply={!!me}
+                  isAdmin={isAdmin}
+                  onDelete={deleteMutation.mutate}
+                  onReply={(id) => { setReplyTo(replyTo === id ? null : id); setReplyText(""); }}
+                />
+
+                {replyTo === c.id && me && (
+                  <form
+                    onSubmit={(e) => { e.preventDefault(); if (replyText.trim().length >= 2) postMutation.mutate({ text: replyText.trim(), parentId: c.id }); }}
+                    className="mt-2 ml-12"
+                  >
+                    <Textarea
+                      placeholder={isAdmin ? "Reply as the GetCyberRight Team. This will show publicly with a verified badge." : "Write a reply."}
+                      value={replyText}
+                      onChange={(e) => setReplyText(e.target.value)}
+                      maxLength={2000}
+                      rows={2}
+                      className="mb-2"
+                      data-testid={`textarea-reply-${c.id}`}
+                    />
+                    <div className="flex items-center justify-end gap-2">
+                      <Button type="button" size="sm" variant="ghost" onClick={() => { setReplyTo(null); setReplyText(""); }} data-testid={`button-cancel-reply-${c.id}`}>
+                        Cancel
+                      </Button>
+                      <Button type="submit" size="sm" disabled={postMutation.isPending || replyText.trim().length < 2} data-testid={`button-submit-reply-${c.id}`}>
+                        {postMutation.isPending && replyTo === c.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Send className="h-3.5 w-3.5 mr-1.5" />Reply</>}
+                      </Button>
+                    </div>
+                  </form>
+                )}
+
+                {(repliesByParent[c.id] || []).length > 0 && (
+                  <div className="mt-3 ml-12 space-y-4 border-l-2 border-border pl-4">
+                    {repliesByParent[c.id].map(r => (
+                      <CommentRow
+                        key={r.id}
+                        comment={r}
+                        isReply={true}
+                        canModerate={canModerate(r)}
+                        canReply={false}
+                        isAdmin={isAdmin}
+                        onDelete={deleteMutation.mutate}
+                        onReply={() => {}}
+                      />
+                    ))}
                   </div>
-                  <p className="text-sm text-foreground/90 whitespace-pre-wrap break-words">{c.content}</p>
-                </div>
+                )}
               </div>
             ))}
           </div>

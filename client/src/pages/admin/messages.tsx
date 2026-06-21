@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/dialog";
 import { Mail, Trash2, Eye } from "lucide-react";
 import { AdminLayout } from "@/components/admin/admin-layout";
+import { ReplyComposer } from "@/components/admin/reply-composer";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import type { ContactMessage } from "@shared/schema";
@@ -197,9 +198,14 @@ export default function AdminMessages() {
                                       : "Unknown"}
                                   </p>
                                 </div>
-                                <Button asChild className="w-full">
-                                  <a href={`mailto:${msg.email}`}>Reply via Email</a>
-                                </Button>
+                                <div className="border-t border-border pt-4">
+                                  <ReplyComposer
+                                    targetType="contact"
+                                    targetId={msg.id}
+                                    toEmail={msg.email}
+                                    defaultSubject={`Re: Your message to GetCyberRight`}
+                                  />
+                                </div>
                               </div>
                             </DialogContent>
                           </Dialog>

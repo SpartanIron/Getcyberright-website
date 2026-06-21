@@ -8,11 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ReplyComposer } from "@/components/admin/reply-composer";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { 
   MessageSquare, Bug, Lightbulb, HelpCircle, Star, FileText, 
-  Clock, CheckCircle2, XCircle, Loader2, Mail, Globe, ExternalLink
+  Clock, CheckCircle2, XCircle, Loader2, Mail, Globe
 } from "lucide-react";
 import type { UserFeedback } from "@shared/schema";
 
@@ -155,16 +156,12 @@ export default function AdminFeedback() {
                           <p className="text-sm whitespace-pre-wrap">{item.message}</p>
                         </div>
 
-                        {item.email && (
-                          <a
-                            href={`mailto:${item.email}?subject=Re: Your feedback on GetCyberRight`}
-                            className="inline-flex items-center gap-1 text-sm text-teal-600 hover:underline"
-                            data-testid={`link-reply-${item.id}`}
-                          >
-                            <ExternalLink className="w-3 h-3" />
-                            Reply via email
-                          </a>
-                        )}
+                        <ReplyComposer
+                          targetType="feedback"
+                          targetId={item.id}
+                          toEmail={item.email}
+                          defaultSubject="Re: Your feedback on GetCyberRight"
+                        />
 
                         <div>
                           <label className="text-xs font-medium text-muted-foreground mb-1 block">Admin Notes</label>

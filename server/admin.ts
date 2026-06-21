@@ -1,7 +1,8 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { db } from "./db";
 import { storage } from "./storage";
-import { users, contactMessages, newsletterSubscribers, scamReports, toolUsage, insertToolUsageSchema, platformAnnouncements, insertAnnouncementSchema, trendingThreats, insertTrendingThreatSchema, userFeedback, cyberSafetyGuides, cyberThreatAlerts, scamIntelligence, socialPosts, growthTasks, shieldScans, exposureScans, exposureFindings, adminNotificationSettings, adminNotificationSettingsSchema } from "@shared/schema";
+import { users, contactMessages, newsletterSubscribers, scamReports, toolUsage, insertToolUsageSchema, platformAnnouncements, insertAnnouncementSchema, trendingThreats, insertTrendingThreatSchema, userFeedback, cyberSafetyGuides, cyberThreatAlerts, scamIntelligence, socialPosts, growthTasks, shieldScans, exposureScans, exposureFindings, adminNotificationSettings, adminNotificationSettingsSchema, supportReplies } from "@shared/schema";
+import { sendEmail, isEmailConfigured } from "./email-service";
 import { isAuthenticated } from "./auth";
 import { eq, desc, count, sql, and, lte, or, isNull, gte } from "drizzle-orm";
 import { securityLogger } from "./security";
@@ -353,6 +354,145 @@ export function registerAdminRoutes(app: Express) {
     } catch (error) {
       console.error("Admin delete message error:", error);
       res.status(500).json({ error: "Failed to delete message" });
+    }
+  });
+
+  // ==========================================
+  // In-panel email replies (feedback + contact messages)
+  // ==========================================
+
+  function escapeHtml(input: string): string {
+    return input
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function buildReplyHtml(body: string): string {
+    const safe = escapeHtml(body).replace(/\n/g, "<br>");
+    return `<div style="font-family: Arial, Helvetica, sans-serif; font-size: 15px; color: #1f2937; line-height: 1.6;">
+      <p>${safe}</p>
+      <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;">
+      <p style="font-size: 13px; color: #6b7280;">The GetCyberRight Team<br>
+      <a href="https://www.getcyberright.com" style="color: #0d9488;">www.getcyberright.com</a></p>
+    </div>`;
+  }
+
+  async function resolveAdminName(req: any): Promise<{ adminId: string | null; adminName: string | null }> {
+    const adminId = req.session?.userId || null;
+    if (!adminId) return { adminId: null, adminName: null };
+    try {
+      const [u] = await db.select().from(users).where(eq(users.id, adminId));
+      const name = u ? ([u.firstName, u.lastName].filter(Boolean).join(" ").trim() || u.email || null) : null;
+      return { adminId, adminName: name };
+    } catch {
+      return { adminId, adminName: null };
+    }
+  }
+
+  const replyBodySchema = z.object({
+    subject: z.string().trim().min(1).max(200),
+    body: z.string().trim().min(1).max(5000),
+  });
+
+  app.post("/api/admin/feedback/:id/reply", isAuthenticated, isAdminMiddleware, async (req: any, res) => {
+    try {
+      const parsed = replyBodySchema.safeParse(req.body);
+      if (!parsed.success) return res.status(400).json({ error: "Subject and message are required" });
+
+      const [item] = await db.select().from(userFeedback).where(eq(userFeedback.id, req.params.id));
+      if (!item) return res.status(404).json({ error: "Feedback not found" });
+      if (!item.email) return res.status(400).json({ error: "This feedback has no email address to reply to" });
+      if (!isEmailConfigured()) return res.status(503).json({ error: "Email sending is not configured on this server" });
+
+      const { adminId, adminName } = await resolveAdminName(req);
+      const delivered = await sendEmail({
+        to: [item.email],
+        subject: parsed.data.subject,
+        htmlBody: buildReplyHtml(parsed.data.body),
+        textBody: parsed.data.body,
+      });
+      if (!delivered) return res.status(502).json({ error: "Email provider failed to send the reply" });
+
+      const [reply] = await db.insert(supportReplies).values({
+        targetType: "feedback",
+        targetId: item.id,
+        toEmail: item.email,
+        subject: parsed.data.subject,
+        body: parsed.data.body,
+        adminId,
+        adminName,
+        delivered,
+      }).returning();
+
+      if (item.status === "new") {
+        await db.update(userFeedback).set({ status: "in_progress", updatedAt: new Date() }).where(eq(userFeedback.id, item.id));
+      }
+      res.status(201).json({ reply });
+    } catch (error) {
+      console.error("Admin feedback reply error:", error);
+      res.status(500).json({ error: "Failed to send reply" });
+    }
+  });
+
+  app.get("/api/admin/feedback/:id/replies", isAuthenticated, isAdminMiddleware, async (req, res) => {
+    try {
+      const replies = await db.select().from(supportReplies)
+        .where(and(eq(supportReplies.targetType, "feedback"), eq(supportReplies.targetId, req.params.id)))
+        .orderBy(desc(supportReplies.createdAt));
+      res.json({ replies });
+    } catch (error) {
+      console.error("Admin feedback replies error:", error);
+      res.status(500).json({ error: "Failed to load replies" });
+    }
+  });
+
+  app.post("/api/admin/contact-messages/:id/reply", isAuthenticated, isAdminMiddleware, async (req: any, res) => {
+    try {
+      const parsed = replyBodySchema.safeParse(req.body);
+      if (!parsed.success) return res.status(400).json({ error: "Subject and message are required" });
+
+      const [item] = await db.select().from(contactMessages).where(eq(contactMessages.id, req.params.id));
+      if (!item) return res.status(404).json({ error: "Message not found" });
+      if (!item.email) return res.status(400).json({ error: "This message has no email address to reply to" });
+      if (!isEmailConfigured()) return res.status(503).json({ error: "Email sending is not configured on this server" });
+
+      const { adminId, adminName } = await resolveAdminName(req);
+      const delivered = await sendEmail({
+        to: [item.email],
+        subject: parsed.data.subject,
+        htmlBody: buildReplyHtml(parsed.data.body),
+        textBody: parsed.data.body,
+      });
+      if (!delivered) return res.status(502).json({ error: "Email provider failed to send the reply" });
+
+      const [reply] = await db.insert(supportReplies).values({
+        targetType: "contact",
+        targetId: item.id,
+        toEmail: item.email,
+        subject: parsed.data.subject,
+        body: parsed.data.body,
+        adminId,
+        adminName,
+        delivered,
+      }).returning();
+      res.status(201).json({ reply });
+    } catch (error) {
+      console.error("Admin contact reply error:", error);
+      res.status(500).json({ error: "Failed to send reply" });
+    }
+  });
+
+  app.get("/api/admin/contact-messages/:id/replies", isAuthenticated, isAdminMiddleware, async (req, res) => {
+    try {
+      const replies = await db.select().from(supportReplies)
+        .where(and(eq(supportReplies.targetType, "contact"), eq(supportReplies.targetId, req.params.id)))
+        .orderBy(desc(supportReplies.createdAt));
+      res.json({ replies });
+    } catch (error) {
+      console.error("Admin contact replies error:", error);
+      res.status(500).json({ error: "Failed to load replies" });
     }
   });
 

@@ -1748,6 +1748,8 @@ export const articleComments = pgTable("article_comments", {
   authorName: text("author_name").notNull(),
   authorEmail: text("author_email"),
   content: text("content").notNull(),
+  parentId: varchar("parent_id"),
+  isTeamReply: boolean("is_team_reply").notNull().default(false),
   status: varchar("status", { length: 20 }).notNull().default("approved"),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -1759,12 +1761,43 @@ export const insertArticleCommentSchema = createInsertSchema(articleComments).om
   authorName: true,
   authorEmail: true,
   userId: true,
+  isTeamReply: true,
 }).extend({
   content: z.string().min(2).max(2000),
+  parentId: z.string().optional().nullable(),
 });
 
 export type ArticleComment = typeof articleComments.$inferSelect;
 export type InsertArticleComment = z.infer<typeof insertArticleCommentSchema>;
+
+// Admin replies to user feedback and contact messages (sent by email, kept for history)
+export const supportReplies = pgTable("support_replies", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  targetType: varchar("target_type", { length: 20 }).notNull(),
+  targetId: varchar("target_id").notNull(),
+  adminId: varchar("admin_id"),
+  adminName: text("admin_name"),
+  toEmail: text("to_email").notNull(),
+  subject: text("subject").notNull(),
+  body: text("body").notNull(),
+  delivered: boolean("delivered").notNull().default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertSupportReplySchema = createInsertSchema(supportReplies).omit({
+  id: true,
+  createdAt: true,
+  delivered: true,
+  adminId: true,
+  adminName: true,
+}).extend({
+  targetType: z.enum(["feedback", "contact"]),
+  subject: z.string().min(1).max(200),
+  body: z.string().min(1).max(5000),
+});
+
+export type SupportReply = typeof supportReplies.$inferSelect;
+export type InsertSupportReply = z.infer<typeof insertSupportReplySchema>;
 
 export const maskedIdentities = pgTable("masked_identities", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),

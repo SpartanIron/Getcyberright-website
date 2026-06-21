@@ -6917,6 +6917,8 @@ BEHAVIORAL CONSTRAINTS
         userId: c.userId,
         authorName: c.authorName,
         content: c.content,
+        parentId: c.parentId || null,
+        isTeamReply: c.isTeamReply === true,
         createdAt: c.createdAt?.toISOString() || new Date().toISOString(),
       })) });
     } catch (error: any) {
@@ -6936,22 +6938,42 @@ BEHAVIORAL CONSTRAINTS
       const userId = req.session.userId;
       const { db } = await import("./db");
       const { articleComments, users } = await import("@shared/schema");
-      const { eq } = await import("drizzle-orm");
+      const { eq, and } = await import("drizzle-orm");
       const [user] = await db.select().from(users).where(eq(users.id, userId));
       if (!user) return res.status(401).json({ error: "User not found" });
-      const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ").trim() || (user.email?.split("@")[0] ?? "Reader");
+
+      // Optional reply: validate the parent comment belongs to the same article
+      let parentId: string | null = null;
+      const rawParentId = typeof req.body?.parentId === "string" ? req.body.parentId.trim() : "";
+      if (rawParentId) {
+        const [parent] = await db.select().from(articleComments)
+          .where(and(eq(articleComments.id, rawParentId), eq(articleComments.articleId, article.id)));
+        if (!parent) return res.status(400).json({ error: "Reply target not found" });
+        // Only allow one level of nesting: a reply to a reply attaches to the top-level parent
+        parentId = parent.parentId || parent.id;
+      }
+
+      const isTeamReply = user.isAdmin === true && parentId !== null;
+      const fullName = isTeamReply
+        ? "GetCyberRight Team"
+        : ([user.firstName, user.lastName].filter(Boolean).join(" ").trim() || (user.email?.split("@")[0] ?? "Reader"));
       const [inserted] = await db.insert(articleComments).values({
         articleId: article.id,
         userId,
         authorName: fullName,
         authorEmail: user.email || null,
         content,
+        parentId,
+        isTeamReply,
         status: "approved",
       }).returning();
       res.status(201).json({
         id: inserted.id,
+        userId: inserted.userId,
         authorName: inserted.authorName,
         content: inserted.content,
+        parentId: inserted.parentId || null,
+        isTeamReply: inserted.isTeamReply === true,
         createdAt: inserted.createdAt?.toISOString() || new Date().toISOString(),
       });
     } catch (error: any) {
