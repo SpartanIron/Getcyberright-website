@@ -84,6 +84,10 @@ const nextConfig = {
         "*.replit.dev",
     ],
 
+    // Empty turbopack config silences the "webpack config but no turbopack config" build error.
+    // Path aliases for dev are handled by webpack() below; Turbopack uses tsconfig paths.
+    turbopack: {},
+
     serverExternalPackages: [
         "drizzle-orm",
         "@neondatabase/serverless",
