@@ -620,6 +620,27 @@ export async function registerRoutes(
       const validatedData = insertContactMessageSchema.parse(req.body);
       const message = await storage.createContactMessage(validatedData);
       securityLogger.info("Contact form submission", { email: validatedData.email });
+
+      try {
+        const { notifyAdmin } = await import("./email-service");
+        const esc = (s: string) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+        await notifyAdmin(
+          `[Contact] New inquiry from GetCyberRight`,
+          `<div style="font-family: Arial, Helvetica, sans-serif; font-size: 15px; color: #1f2937; line-height: 1.6;">
+            <h2 style="color: #0d9488;">New Contact Inquiry</h2>
+            <p><strong>Name:</strong> ${esc(validatedData.name)}</p>
+            <p><strong>Email:</strong> ${esc(validatedData.email)}</p>
+            <p><strong>Category:</strong> ${esc(validatedData.category)}</p>
+            <div style="background:#f9fafb;padding:16px;border-radius:6px;margin:12px 0;white-space:pre-wrap;">${esc(validatedData.message)}</div>
+            <p style="color:#6b7280;font-size:13px;">Submitted: ${new Date().toLocaleString()}</p>
+            <a href="https://www.getcyberright.com/admin/messages" style="display:inline-block;background:#0d9488;color:#fff;padding:10px 20px;border-radius:6px;text-decoration:none;">View in Admin</a>
+          </div>`,
+          `New contact inquiry from ${validatedData.email}:\n\n${validatedData.message}`
+        );
+      } catch (notifyErr) {
+        console.error("[contact] Notification error:", notifyErr);
+      }
+
       res.json({ success: true, message });
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -4743,39 +4764,31 @@ BEHAVIORAL CONSTRAINTS
       });
 
       try {
-        const { Resend } = await import("resend");
-        const resendKey = process.env.RESEND_API_KEY;
-        const adminEmail = process.env.ADMIN_EMAIL;
-        if (resendKey && adminEmail) {
-          const resend = new Resend(resendKey);
-          const escapeHtml = (str: string) => str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-          const safeMessage = escapeHtml(parsed.data.message);
-          const safeEmail = parsed.data.email ? escapeHtml(parsed.data.email) : "";
-          const safePage = escapeHtml(parsed.data.page || "Not specified");
-          const safeCategory = escapeHtml(parsed.data.category);
-          await resend.emails.send({
-            from: "GetCyberRight <tips@getcyberright.com>",
-            to: [adminEmail],
-            subject: `[Feedback] New ${parsed.data.category} from GetCyberRight`,
-            html: `
-              <div style="font-family: -apple-system, sans-serif, max-width: 600px, margin: 0 auto;">
-                <div style="background: #0d9488; padding: 20px, border-radius: 8px 8px 0 0;">
-                  <h2 style="color: white, margin: 0;">New User Feedback</h2>
-                </div>
-                <div style="border: 1px solid #e5e7eb, border-top: none, padding: 20px, border-radius: 0 0 8px 8px;">
-                  <p><strong>Category:</strong> ${safeCategory}</p>
-                  <p><strong>Page:</strong> ${safePage}</p>
-                  ${safeEmail ? `<p><strong>Email:</strong> ${safeEmail}</p>` : ""}
-                  <div style="background: #f9fafb, padding: 16px, border-radius: 6px, margin: 16px 0;">
-                    <p style="margin: 0; white-space: pre-wrap;">${safeMessage}</p>
-                  </div>
-                  <p style="color: #6b7280; font-size: 14px;">Submitted: ${new Date().toLocaleString()}</p>
-                  <a href="${req.protocol}://${req.get("host")}/admin/feedback" style="display: inline-block, background: #0d9488; color: white, padding: 10px 20px, border-radius: 6px, text-decoration: none, margin-top: 8px;">View in Admin</a>
-                </div>
+        const { notifyAdmin } = await import("./email-service");
+        const escapeHtml = (str: string) => String(str ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+        const safeMessage = escapeHtml(parsed.data.message);
+        const safeEmail = parsed.data.email ? escapeHtml(parsed.data.email) : "";
+        const safePage = escapeHtml(parsed.data.page || "Not specified");
+        const safeCategory = escapeHtml(parsed.data.category);
+        await notifyAdmin(
+          `[Feedback] New ${parsed.data.category} from GetCyberRight`,
+          `<div style="font-family: -apple-system, Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background: #0d9488; padding: 20px; border-radius: 8px 8px 0 0;">
+              <h2 style="color: white; margin: 0;">New User Feedback</h2>
+            </div>
+            <div style="border: 1px solid #e5e7eb; border-top: none; padding: 20px; border-radius: 0 0 8px 8px;">
+              <p><strong>Category:</strong> ${safeCategory}</p>
+              <p><strong>Page:</strong> ${safePage}</p>
+              ${safeEmail ? `<p><strong>Email:</strong> ${safeEmail}</p>` : ""}
+              <div style="background: #f9fafb; padding: 16px; border-radius: 6px; margin: 16px 0;">
+                <p style="margin: 0; white-space: pre-wrap;">${safeMessage}</p>
               </div>
-            `,
-          });
-        }
+              <p style="color: #6b7280; font-size: 14px;">Submitted: ${new Date().toLocaleString()}</p>
+              <a href="https://www.getcyberright.com/admin/feedback" style="display: inline-block; background: #0d9488; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; margin-top: 8px;">View in Admin</a>
+            </div>
+          </div>`,
+          `New ${parsed.data.category} feedback${safeEmail ? ` from ${parsed.data.email}` : ""}:\n\n${parsed.data.message}`
+        );
       } catch (emailErr) {
         console.error("[feedback] Email notification error:", emailErr);
       }
@@ -6967,6 +6980,27 @@ BEHAVIORAL CONSTRAINTS
         isTeamReply,
         status: "approved",
       }).returning();
+      if (!isTeamReply) {
+        try {
+          const { notifyAdmin } = await import("./email-service");
+          const esc = (s: string) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+          const articleUrl = `https://www.getcyberright.com/news/${article.slug}`;
+          await notifyAdmin(
+            `[Comment] ${parentId ? "New reply" : "New comment"} on "${article.title}"`,
+            `<div style="font-family: Arial, Helvetica, sans-serif; font-size: 15px; color: #1f2937; line-height: 1.6;">
+              <h2 style="color: #0d9488;">${parentId ? "New reply" : "New comment"} on an article</h2>
+              <p><strong>Article:</strong> <a href="${esc(articleUrl)}">${esc(article.title)}</a></p>
+              <p><strong>From:</strong> ${esc(fullName)}${user.email ? ` (${esc(user.email)})` : ""}</p>
+              <div style="background:#f9fafb;padding:16px;border-radius:6px;margin:12px 0;white-space:pre-wrap;">${esc(content)}</div>
+              <p style="color:#6b7280;font-size:13px;">Submitted: ${new Date().toLocaleString()}</p>
+            </div>`,
+            `New ${parentId ? "reply" : "comment"} by ${fullName} on "${article.title}":\n\n${content}\n\n${articleUrl}`
+          );
+        } catch (notifyErr) {
+          console.error("[comments] Notification error:", notifyErr);
+        }
+      }
+
       res.status(201).json({
         id: inserted.id,
         userId: inserted.userId,

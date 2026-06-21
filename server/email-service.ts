@@ -167,6 +167,19 @@ async function sendViaResend(options: EmailOptions): Promise<boolean> {
   }
 }
 
+export function getAdminNotifyEmail(): string {
+  return process.env.ADMIN_NOTIFY_EMAIL || 'info@getcyberright.com';
+}
+
+export async function notifyAdmin(subject: string, htmlBody: string, textBody?: string): Promise<boolean> {
+  return sendEmail({
+    to: [getAdminNotifyEmail()],
+    subject,
+    htmlBody,
+    textBody,
+  });
+}
+
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
   const provider = getConfiguredProvider();
   
