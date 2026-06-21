@@ -22,6 +22,7 @@ import { registerStripeRoutes, registerStripeWebhook } from "./stripe";
 import { decryptVaultData } from "./vaultEncryption";
 import { handleArticleOgImage } from "./og-image-service";
 import { handleNewsRss } from "./rss-feed";
+import { registerFeedbackExtensionRoutes } from "./feedbackExtensions";
 import { logVaultAccess, extractRequestContext } from "./vaultAuditLog";
 import { 
   checkGoogleSafeBrowsing, 
@@ -511,6 +512,7 @@ export async function registerRoutes(
 
   // Register custom auth routes
   registerAuthRoutes(app);
+    registerFeedbackExtensionRoutes(app);
 
   app.get('/api/user/dashboard-stats', isAuthenticated, async (req: Request, res: Response) => {
     try {
