@@ -36,7 +36,7 @@ const faqCategories = [
     iconKey: "shield" as const,
     questions: [
       { q: "What is GetCyberRight?", a: "GetCyberRight is a mission-driven platform dedicated to family cyber safety. We provide educational resources, tools, and guidance to help families navigate the online world safely. Our content is designed for everyone, from children learning about social media to seniors protecting themselves from scams." },
-      { q: "Is GetCyberRight free?", a: "Everything on GetCyberRight is completely free! All tools, features, and educational resources are available at no cost. Just create a free account to get full access to our scam checking tools, data removal, training courses, and more. We believe cybersecurity education and protection should be accessible to everyone." },
+      { q: "Is GetCyberRight free?", a: "Our core cybersecurity education and many of our safety tools are free. Just create a free account to access our scam checking tools, data removal basics, training courses, and more. We also offer optional paid plans (such as GCR Scam Guard tiers) that unlock advanced protection, and the platform shows ads to help keep the free features free. We believe cybersecurity education should be accessible to everyone." },
       { q: "Who creates the content on GetCyberRight?", a: "Our content is created by online safety professionals and educators who specialize in making complex topics accessible to everyday families. We reference authoritative sources from law enforcement and security agencies worldwide to ensure accuracy." },
       { q: "How is GetCyberRight different from other cybersecurity sites?", a: "We focus specifically on families and use plain language instead of technical jargon. Our content is tailored for different audiences including youth, seniors, parents, and travelers. We also provide region-specific guidance for users around the world." },
     ],
@@ -57,7 +57,7 @@ const faqCategories = [
     questions: [
       { q: "What is GCR Scam Guard?", a: "GCR Scam Guard is our Chrome browser extension that protects you from scams in real time as you browse. It can automatically scan pages for threats, detect fake websites, and warn you before you interact with suspicious content." },
       { q: "How do I install and set up GCR Scam Guard?", a: "Install GCR Scam Guard from the Chrome Web Store. Then visit getcyberright.com, log into your account, go to the Extension Auth page to generate a connection token, and paste it into the extension's Settings. This links the extension to your account." },
-      { q: "What features are available?", a: "All features are free! You can manually scan any page by right-clicking and selecting 'Scan with GCR Scam Guard' or clicking the extension icon. Auto-Protect, notification blocking, search safety badges, and all other features are included at no cost." },
+      { q: "What features are available?", a: "Core features are free. You can manually scan any page by right-clicking and selecting 'Scan with GCR Scam Guard' or clicking the extension icon. Some advanced features depend on your subscription tier, but everyday scam protection and basic safety tools are available at no cost." },
       { q: "What does Auto-Protect do?", a: "Auto-Protect automatically scans every page you visit in the background without you having to click anything. If a threat is detected, you get an instant notification. Auto-Protect is available for free with your account." },
       { q: "What data does the extension collect?", a: "The extension sends page URLs and a summary of page content to our servers for threat analysis. It does not collect your browsing history, passwords, or form data. Your settings are stored locally in your browser. See our Privacy Policy for full details." },
       { q: "How do I disconnect the extension from my account?", a: "You can revoke your extension token at any time from your account settings on getcyberright.com. You can also uninstall the extension from Chrome at any time." },
@@ -67,9 +67,9 @@ const faqCategories = [
     title: "Access and Features",
     iconKey: "creditcard" as const,
     questions: [
-      { q: "What features are included?", a: "Every feature on GetCyberRight is free with a registered account. That includes manual and automatic scans, browser extension protection, scan history, safety scores, family profiles, data removal tools, training courses, and more." },
-      { q: "How do I access all features?", a: "Simply create a free account to unlock full access to every tool and feature on GetCyberRight. There are no paid tiers. Everything is free." },
-      { q: "Will GetCyberRight always be free?", a: "Yes, we are committed to making cybersecurity education and tools accessible to everyone. All features are completely free with a registered account." },
+      { q: "What features are included?", a: "A registered account gives you our core tools at no cost, including manual and automatic scans, browser extension protection, scan history, safety scores, family profiles, basic data removal, and training courses. Advanced protection is available through optional paid plans." },
+      { q: "How do I access all features?", a: "Create a free account to access our core tools and educational content. Advanced protection is available through optional paid plans (such as GCR Scam Guard tiers), and you can see exactly what each plan includes on the relevant pricing page." },
+      { q: "Will GetCyberRight always have free options?", a: "Yes. We are committed to keeping foundational cybersecurity education and core safety tools free for everyone, supported by ads and optional paid plans. Advanced features may be part of a paid plan." },
       { q: "Is there family support?", a: "Yes! Family profile support is included for free, allowing you to manage protection for multiple family members under one account." },
     ],
   },
@@ -106,8 +106,8 @@ const faqCategories = [
     title: "Privacy and Security",
     iconKey: "globe" as const,
     questions: [
-      { q: "How do you protect my data?", a: "We use industry-standard security measures including HTTPS encryption, secure authentication, and minimal data collection. We use analytics to improve your experience, but we never sell your data or share it with advertisers. See our Privacy Policy for complete details." },
-      { q: "Do you use cookies?", a: "We use essential cookies for site functionality and analytics cookies to understand how visitors use the site so we can improve it. We never share your data with advertisers. You can manage cookie preferences in your browser settings." },
+      { q: "How do you protect my data?", a: "We use industry-standard security measures including HTTPS encryption, secure authentication, and minimal data collection. We never sell your data for money. We do show ads to keep the platform free, and you can opt out of ad personalization anytime through our Cookie Settings or the 'Do Not Sell or Share My Personal Information' link in the footer. See our Privacy Policy for complete details." },
+      { q: "Do you use cookies?", a: "We use essential cookies for site functionality, analytics cookies to understand how visitors use the site, and advertising cookies to help keep the platform free. Analytics and advertising cookies only load if you allow them in our cookie banner, and you can change your choices anytime in Cookie Settings. We also honor Global Privacy Control (GPC) signals automatically." },
       { q: "How can I contact you about privacy concerns?", a: "You can reach us through our Contact page. We take privacy concerns seriously and will respond to inquiries as quickly as possible." },
     ],
   },

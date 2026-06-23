@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { hasMarketingConsent } from "@/components/cookie-consent";
 
 export type AdFormat =
   | "in-article"
@@ -33,16 +34,26 @@ export default function AdSlot({
   className,
   testId,
 }: AdSlotProps) {
+  const [marketingAllowed, setMarketingAllowed] = useState(false);
+
   useEffect(() => {
-    if (!ADSENSE_CLIENT || !slot) return;
+    const update = () => setMarketingAllowed(hasMarketingConsent());
+    update();
+    window.addEventListener("cookie-consent-updated", update);
+    return () => window.removeEventListener("cookie-consent-updated", update);
+  }, []);
+
+  useEffect(() => {
+    if (!ADSENSE_CLIENT || !slot || !marketingAllowed) return;
     try {
       (window.adsbygoogle = window.adsbygoogle || []).push({});
     } catch {
       // adsbygoogle.js may not be loaded yet on first render; silently ignore.
     }
-  }, [slot]);
+  }, [slot, marketingAllowed]);
 
   if (!ADSENSE_CLIENT || !slot) return null;
+  if (!marketingAllowed) return null;
 
   const insStyle: React.CSSProperties = { display: "block" };
   let dataAdFormat = "auto";

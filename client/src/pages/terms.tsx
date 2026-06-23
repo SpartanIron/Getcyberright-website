@@ -165,6 +165,53 @@ export default function Terms() {
                     We reserve the right to modify or update features as needed to improve the platform. 
                     We are committed to keeping foundational cybersecurity education accessible to everyone.
                   </p>
+
+                  <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">4.6 Free Content and Paid Plans</h3>
+                  <p>
+                    Our core cybersecurity education and many of our safety tools are free to use. We also 
+                    offer optional paid plans (for example, GCR Scam Guard subscription tiers) that unlock 
+                    additional features. The features, limits, and current prices of each plan are shown on 
+                    the relevant pricing page at the time you subscribe. We may change plan features or prices 
+                    going forward, and if we change the price of a plan you are already on, we will give you 
+                    notice before the change takes effect on your next billing cycle.
+                  </p>
+
+                  <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">4.7 Billing and Automatic Renewal</h3>
+                  <p>
+                    Paid plans are billed on a recurring basis (monthly or annually, depending on the plan 
+                    you choose) through our third-party payment processor, Stripe. By subscribing, you 
+                    authorize us to charge your payment method the plan fee, plus any applicable taxes, at 
+                    the start of each billing period.
+                  </p>
+                  <p className="mt-3 font-semibold text-foreground">
+                    Your subscription renews automatically at the end of each billing period until you cancel.
+                  </p>
+                  <p className="mt-3">
+                    Each renewal is charged at the then-current price for your plan using the payment method on 
+                    file, unless you cancel before the renewal date. We do not store your full payment card 
+                    details on our servers; payment information is handled directly by Stripe.
+                  </p>
+
+                  <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">4.8 Cancellation</h3>
+                  <p>
+                    You can cancel a paid plan at any time from your account settings or by contacting us at 
+                    <a href="mailto:info@getcyberright.com" className="text-primary hover:underline"> info@getcyberright.com</a>. 
+                    When you cancel, your plan stays active until the end of the billing period you have already 
+                    paid for, and it will not renew after that. You will continue to have access to paid features 
+                    until that date. Cancelling stops future charges but, except as described in Section 4.9, does 
+                    not retroactively refund the current billing period.
+                  </p>
+
+                  <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">4.9 30-Day Money-Back Guarantee</h3>
+                  <p>
+                    We offer a 30-day money-back guarantee on paid plans. If you are not satisfied, contact us at 
+                    <a href="mailto:info@getcyberright.com" className="text-primary hover:underline"> info@getcyberright.com</a> 
+                    within 30 days of your initial purchase and we will refund that payment. The guarantee applies 
+                    to your first payment for a plan; renewal charges after the first 30 days are non-refundable 
+                    except where a refund is required by applicable law. Refunds are issued to your original 
+                    payment method through Stripe. This guarantee does not limit any statutory rights you may have 
+                    as a consumer.
+                  </p>
                 </section>
 
                 <section>

@@ -3,7 +3,6 @@ import { headers } from "next/headers";
 import "../client/src/index.css";
 import Providers from "./providers";
 import AppShell from "./app-shell";
-import GoogleAnalytics from "../client/src/components/google-analytics";
 import GoogleAdsense from "../client/src/components/google-adsense";
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -145,7 +144,6 @@ export default async function RootLayout({
         />
       </head>
       <body>
-        <GoogleAnalytics />
         <GoogleAdsense />
         <div id="root">
           <Providers><AppShell>{children}</AppShell></Providers>

@@ -46,11 +46,11 @@ const freeAccess = isFreeAccessPeriod();
 const promos: PromoBanner[] = [
   {
     id: "pro-trial",
-    badge: freeAccess ? "All Features Free" : "Limited Time Offer",
+    badge: freeAccess ? "Free Core Tools" : "Limited Time Offer",
     badgeIcon: Gift,
     badgeColor: "bg-orange-500/90 text-white",
-    headline: "Every Tool Is Completely Free",
-    subheadline: "All GCR Scam Guard and Data Shield tools are completely free. No credit card, no catches. Create a free account and use everything.",
+    headline: "Start Protecting Your Family For Free",
+    subheadline: "Core GCR Scam Guard and Data Shield tools are free. No credit card needed to start. Optional paid plans unlock advanced protection.",
     cta: "Start Using Tools",
     ctaHref: "/tools",
     secondaryCta: "Create Free Account",

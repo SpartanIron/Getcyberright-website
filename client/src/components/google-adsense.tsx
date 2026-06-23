@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Script from "next/script";
 import { usePathname } from "next/navigation";
+import { hasMarketingConsent } from "@/components/cookie-consent";
 
 const ADSENSE_CLIENT =
   process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "ca-pub-4503226092429202";
@@ -26,6 +28,7 @@ const PRIVATE_PATH_PREFIXES = [
   "/breach-dashboard",
   "/quick-assessment",
   "/safety-score",
+  "/kids",
 ];
 
 function isAdAllowedPath(pathname: string | null): boolean {
@@ -37,8 +40,18 @@ function isAdAllowedPath(pathname: string | null): boolean {
 
 export default function GoogleAdsense() {
   const pathname = usePathname();
+  const [marketingAllowed, setMarketingAllowed] = useState(false);
+
+  useEffect(() => {
+    const update = () => setMarketingAllowed(hasMarketingConsent());
+    update();
+    window.addEventListener("cookie-consent-updated", update);
+    return () => window.removeEventListener("cookie-consent-updated", update);
+  }, []);
+
   if (!ADSENSE_CLIENT) return null;
   if (!isAdAllowedPath(pathname)) return null;
+  if (!marketingAllowed) return null;
 
   return (
     <>

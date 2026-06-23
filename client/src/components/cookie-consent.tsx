@@ -24,15 +24,38 @@ export function getCookiePreferences(): CookiePreferences | null {
   }
 }
 
+export function isGpcEnabled(): boolean {
+  if (typeof navigator === "undefined") return false;
+  return (navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl === true;
+}
+
 export function hasAnalyticsConsent(): boolean {
+  if (isGpcEnabled()) return false;
   const prefs = getCookiePreferences();
   return prefs?.analytics === true;
+}
+
+export function hasMarketingConsent(): boolean {
+  if (isGpcEnabled()) return false;
+  const prefs = getCookiePreferences();
+  return prefs?.marketing === true;
 }
 
 function saveCookiePreferences(prefs: CookiePreferences): void {
   if (typeof window === 'undefined') return;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
   window.dispatchEvent(new CustomEvent("cookie-consent-updated", { detail: prefs }));
+}
+
+export function optOutOfSale(): void {
+  if (typeof window === "undefined") return;
+  const existing = getCookiePreferences();
+  saveCookiePreferences({
+    necessary: true,
+    analytics: existing?.analytics ?? false,
+    marketing: false,
+    consentedAt: new Date().toISOString(),
+  });
 }
 
 export function CookieConsent() {
@@ -44,12 +67,20 @@ export function CookieConsent() {
   const firstFocusRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
     const checkConsent = () => {
       const existing = getCookiePreferences();
-      if (!existing) {
-        const timer = setTimeout(() => setVisible(true), 1500);
-        return () => clearTimeout(timer);
+      if (existing) return;
+      if (isGpcEnabled()) {
+        saveCookiePreferences({
+          necessary: true,
+          analytics: false,
+          marketing: false,
+          consentedAt: new Date().toISOString(),
+        });
+        return;
       }
+      timer = setTimeout(() => setVisible(true), 1500);
     };
     checkConsent();
 
@@ -63,7 +94,10 @@ export function CookieConsent() {
       }
     };
     window.addEventListener("cookie-consent-reopen", handleReopen);
-    return () => window.removeEventListener("cookie-consent-reopen", handleReopen);
+    return () => {
+      window.removeEventListener("cookie-consent-reopen", handleReopen);
+      if (timer) clearTimeout(timer);
+    };
   }, []);
 
   useEffect(() => {
@@ -150,7 +184,7 @@ export function CookieConsent() {
                 Your Privacy Matters
               </h3>
               <p className="text-sm text-muted-foreground leading-relaxed" id="cookie-consent-desc">
-                We use cookies to keep the site running (necessary) and to understand how people use our tools (analytics). We never sell your data. You choose what to allow.
+                We use cookies to keep the site running (necessary), to understand how people use our tools (analytics), and to show ads that help keep GetCyberRight free (marketing). You choose what to allow, and you can change your mind anytime in Cookie Settings.
               </p>
             </div>
             <button
@@ -197,7 +231,7 @@ export function CookieConsent() {
               <div className="flex items-center justify-between">
                 <div id="marketing-label">
                   <p className="text-sm font-medium text-foreground">Marketing</p>
-                  <p className="text-xs text-muted-foreground">Used for social media features and relevant content suggestions.</p>
+                  <p className="text-xs text-muted-foreground">Used for advertising and social media features. Turning this off stops personalized ads and ad-related sharing.</p>
                 </div>
                 <label className="relative inline-flex cursor-pointer items-center" data-testid="cookie-toggle-marketing">
                   <input

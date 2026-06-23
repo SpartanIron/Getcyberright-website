@@ -38,7 +38,7 @@ const whatWeOffer = [
 
 const ourValues = [
   { icon: Heart, title: "Family First", description: "We exist to protect the people that corporate cybersecurity leaves behind: parents, kids, seniors, and everyday families." },
-  { icon: Lock, title: "Your Data Stays Yours", description: "We never sell your personal information. We use analytics to improve your experience, but your data is never shared with advertisers or data brokers." },
+  { icon: Lock, title: "Your Data Stays Yours", description: "We never sell your personal information for money, and we never share it with data brokers. We show ads to keep the platform free, and you can opt out of ad personalization anytime in Cookie Settings." },
   { icon: Eye, title: "Full Transparency", description: "Core safety tools are free to use. Paid plans unlock advanced protection, and we are always upfront about what is included at every level." },
   { icon: Handshake, title: "Trusted Partnerships", description: "We are sustained through partnerships with credible companies and organizations who share our mission to make families safer." },
 ];

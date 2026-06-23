@@ -9,7 +9,7 @@ const differentiators = [
   {
     icon: Heart,
     title: "Mission First. Always.",
-    description: "We never sell your data. All safety tools and features are completely free. We exist to make real cybersecurity accessible to everyone.",
+    description: "We never sell your data for money. Our core safety tools are free, with optional paid plans for advanced protection. We exist to make real cybersecurity accessible to everyone.",
     color: "text-red-500",
     bgColor: "bg-red-500/10",
     href: "/about",

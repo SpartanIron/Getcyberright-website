@@ -71,7 +71,7 @@ export default function SecurityPage() {
       details: [
         "Analytics used only to improve your experience",
         "Form submissions stored securely",
-        "Personal data never sold or shared with advertisers",
+        "Personal data never sold for money; you control ad and analytics cookies",
         "Security tools run entirely in your browser",
       ],
       compliance: ["GDPR", "Privacy by Design"],

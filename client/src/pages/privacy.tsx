@@ -190,11 +190,12 @@ export default function Privacy() {
                   </p>
 
                   <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">4.2 Opting Out of Analytics</h3>
-                  <p>You can opt out of Google Analytics by:</p>
+                  <p>Analytics cookies load only after you give consent through our cookie banner. You can opt out of Google Analytics by:</p>
                   <ul className="list-disc pl-6 space-y-2">
+                    <li>Declining analytics in our cookie banner, or turning analytics off later through the "Cookie Settings" link in our footer</li>
+                    <li>Sending a Global Privacy Control (GPC) signal, which we honor automatically (see Section 4.4)</li>
                     <li>Installing the <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Google Analytics Opt-out Browser Add-on</a></li>
-                    <li>Adjusting your browser settings to reject cookies</li>
-                    <li>Using browser privacy features or extensions that block tracking</li>
+                    <li>Adjusting your browser settings to reject cookies, or using browser privacy features or extensions that block tracking</li>
                   </ul>
 
                   <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">4.3 Essential Cookies</h3>
@@ -204,13 +205,26 @@ export default function Privacy() {
                     settings. These cookies cannot be disabled as they are required for the Service to function.
                   </p>
 
-                  <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">4.4 Do Not Track Signals</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">4.4 Do Not Track and Global Privacy Control</h3>
                   <p>
-                    Some browsers offer a "Do Not Track" (DNT) setting that sends a signal to websites you visit 
-                    indicating that you do not want to be tracked. There is currently no universally accepted 
-                    standard for how companies should respond to DNT signals. At this time, our Service does not 
-                    respond to DNT signals. However, you can use the opt-out methods described in Section 4.2 to 
-                    limit tracking on our Service.
+                    Some browsers offer a "Do Not Track" (DNT) setting. There is currently no universally accepted 
+                    standard for how companies should respond to DNT signals, so we cannot guarantee a response to 
+                    every DNT configuration. However, we do honor the Global Privacy Control (GPC) signal. When your 
+                    browser or a browser extension sends a GPC signal, we automatically treat it as an opt-out of 
+                    analytics and advertising cookies and of any "sale" or "sharing" of your personal information, 
+                    without requiring any further action from you.
+                  </p>
+
+                  <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">4.5 Advertising Cookies</h3>
+                  <p>
+                    GetCyberRight displays third-party advertising (currently through Google AdSense) on some public 
+                    pages to help keep the platform free. These ad services may use cookies and similar technologies 
+                    to measure ad performance and, where you allow it, to show more relevant ads. Advertising cookies 
+                    load only after you give consent through our cookie banner. If you decline marketing cookies, send 
+                    a Global Privacy Control signal, or use the "Do Not Sell or Share My Personal Information" link in 
+                    our footer, we do not load personalized advertising. We do not show advertising in the children's 
+                    safety section or inside the GCR Scam Guard browser extension. Learn more in 
+                    <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline"> Google's advertising policies</a>.
                   </p>
                 </section>
 
@@ -254,14 +268,21 @@ export default function Privacy() {
 
                 <section>
                   <h2 className="text-2xl font-bold text-foreground mb-4">6. Information Sharing and Disclosure</h2>
-                  <p className="font-semibold text-foreground">We do not sell, rent, or trade your personal information to third parties.</p>
-                  <p>We may share your information in the following limited circumstances:</p>
+                  <p className="font-semibold text-foreground">We never sell your personal information for money.</p>
+                  <p>
+                    We do show third-party ads (see Section 4.5), and under some privacy laws allowing advertising 
+                    cookies may count as "sharing" or a "sale" of personal information. You can opt out at any time 
+                    using the "Do Not Sell or Share My Personal Information" link in our footer, the "Cookie Settings" 
+                    link, or a Global Privacy Control signal. Apart from advertising, we may share your information 
+                    only in the following limited circumstances:
+                  </p>
                   
                   <h3 className="text-xl font-semibold text-foreground mb-3 mt-4">6.1 Service Providers</h3>
                   <p>We work with trusted third-party service providers who assist us in operating our Service:</p>
                   <ul className="list-disc pl-6 space-y-2">
                     <li><strong className="text-foreground">Payment Processors:</strong> Payment processing is handled by PCI-DSS compliant third-party providers. We do not store your full payment card details on our servers.</li>
-                    <li><strong className="text-foreground">Google Analytics:</strong> Website analytics and performance measurement</li>
+                    <li><strong className="text-foreground">Google Analytics:</strong> Website analytics and performance measurement (loads only with your analytics consent)</li>
+                    <li><strong className="text-foreground">Google AdSense:</strong> Third-party advertising on some public pages to help keep the platform free (loads only with your marketing consent; never in the children's section or the browser extension)</li>
                     <li><strong className="text-foreground">Anthropic:</strong> Powering our Dezi AI assistant. Conversations are processed under our commercial agreement. Anthropic does not use your data to train its models.</li>
                     <li><strong className="text-foreground">Replit:</strong> Application hosting and infrastructure</li>
                     <li><strong className="text-foreground">Email service providers:</strong> Newsletter and transactional email delivery</li>
@@ -378,13 +399,17 @@ export default function Privacy() {
                   <ul className="list-disc pl-6 space-y-2">
                     <li>Right to know what personal information is collected, used, shared, or sold</li>
                     <li>Right to delete personal information held by businesses</li>
-                    <li>Right to opt-out of the sale or sharing of personal information (we do not sell or share your data for cross-context behavioral advertising)</li>
+                    <li>Right to opt-out of the sale or sharing of personal information for cross-context behavioral advertising (use the "Do Not Sell or Share My Personal Information" link in our footer; we also honor Global Privacy Control signals automatically)</li>
                     <li>Right to non-discrimination for exercising your privacy rights</li>
                     <li>Right to correct inaccurate personal information</li>
                     <li>Right to limit the use and disclosure of sensitive personal information</li>
                   </ul>
                   <p className="mt-4">
-                    We do not sell personal information as defined under the CCPA/CPRA. We do not use or disclose 
+                    We do not sell your personal information for money. We do allow third-party advertising partners 
+                    (such as Google AdSense) to collect identifiers and usage data through cookies to show ads, which 
+                    may be considered a "sale" or "sharing" under the CCPA/CPRA. You can opt out at any time using the 
+                    "Do Not Sell or Share My Personal Information" link in our footer, the "Cookie Settings" link, or a 
+                    Global Privacy Control (GPC) signal, which we honor automatically. We do not use or disclose 
                     sensitive personal information for purposes other than those permitted by the CPRA.
                   </p>
 

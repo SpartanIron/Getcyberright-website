@@ -1345,7 +1345,7 @@ export default function Kids() {
                 <ul className="space-y-3">
                   <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-emerald-600 mt-1 flex-shrink-0" /><span>We do not ask kids to make an account to use any lesson on this site.</span></li>
                   <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-emerald-600 mt-1 flex-shrink-0" /><span>We do not collect names, emails, photos, or schoolwork from kids.</span></li>
-                  <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-emerald-600 mt-1 flex-shrink-0" /><span>We do not show ads on this site, and we never sell anyone's information.</span></li>
+                  <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-emerald-600 mt-1 flex-shrink-0" /><span>We do not show ads in this Kids section, and we never sell anyone's information for money.</span></li>
                   <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-emerald-600 mt-1 flex-shrink-0" /><span>If a quiz keeps your score, it stays on your device only. We don't see it.</span></li>
                   <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-emerald-600 mt-1 flex-shrink-0" /><span>If you ever feel unsafe online, tell a trusted adult right away. You won't be in trouble for asking for help.</span></li>
                 </ul>

@@ -34,7 +34,10 @@ export const initGA = () => {
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-    gtag('config', '${measurementId}');
+    gtag('config', '${measurementId}', {
+      anonymize_ip: true,
+      cookie_flags: 'SameSite=None;Secure',
+    });
   `;
   document.head.appendChild(script2);
 

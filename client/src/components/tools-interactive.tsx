@@ -490,7 +490,7 @@ export function ToolsInteractive({ tab: tabParam }: { tab?: string }) {
                   <ShieldCheck className="w-6 h-6 text-teal-500" />
                 </div>
                 <h3 className="font-semibold mb-1.5">All Tools Included</h3>
-                <p className="text-xs text-muted-foreground mb-3">Get full access to both products, completely free</p>
+                <p className="text-xs text-muted-foreground mb-3">Start free, upgrade anytime for advanced protection</p>
                 <Link href="/register">
                   <Button size="sm" className="text-xs" data-testid="button-combo-bundle">
                     Sign Up Free

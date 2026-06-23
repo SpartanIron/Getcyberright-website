@@ -133,25 +133,25 @@ const localResponses: LocalMatch[] = [
   {
     pattern: (t) => /(what is getcyberright|about.*(this|your).*(site|website|platform)|what.*(this|your) (site|website))/.test(t),
     responses: [
-      "GetCyberRight is a family-focused online safety platform. We help everyday people, parents, kids, seniors, and anyone else protect themselves online. We have tools like GCR Scam Guard to analyze suspicious messages, a Password Generator, GCR Data Shield to scan for your exposed personal data, and lots of guides tailored to different family members. All tools and features are completely free. Just create an account to get full access.",
+      "GetCyberRight is a family-focused online safety platform. We help everyday people, parents, kids, seniors, and anyone else protect themselves online. We have tools like GCR Scam Guard to analyze suspicious messages, a Password Generator, GCR Data Shield to scan for your exposed personal data, and lots of guides tailored to different family members. Our core tools are free, with optional paid plans for advanced protection. Just create an account to get started.",
     ],
   },
   {
     pattern: (t) => /(how much|pricing|price|cost|how much does)/.test(t) && /(plan|pro|family|subscribe|subscription|bundle)/.test(t),
     responses: [
-      "Great news: everything on GetCyberRight is completely free right now! All tools, features, and resources are available at no cost. Just create a free account to get full access to GCR Scam Guard, Data Shield, training courses, and everything else.",
+      "Good news: our core tools are free to use! Just create a free account to get started with GCR Scam Guard, Data Shield, training courses, and more. We also offer optional paid plans that unlock advanced protection, and you can see what each plan includes on our pricing page.",
     ],
   },
   {
     pattern: (t) => /(cancel|unsubscribe|stop.*(subscription|paying|plan))/.test(t),
     responses: [
-      "Good news: GetCyberRight is completely free! There's nothing to cancel. If you'd like to delete your account, head to /contact and send us a message.",
+      "If you're on a free account, there's nothing to cancel. If you have a paid plan, you can cancel it anytime from your account settings, and it stays active until the end of your billing period. To delete your account, head to /contact and send us a message.",
     ],
   },
   {
     pattern: (t) => /(payment.*(fail|decline|reject|issue|problem|error|wrong)|card.*(decline|reject|fail|issue|not work)|billing.*(issue|problem|error))/.test(t),
     responses: [
-      "GetCyberRight is completely free, so there should be no charges. If you're seeing unexpected billing, please contact us at /contact with your account email and we'll sort it out right away.",
+      "Our core tools are free, so a free account should see no charges. Charges only apply if you're on an optional paid plan. If you're seeing unexpected billing, please contact us at /contact with your account email and we'll sort it out right away. Paid plans also come with a 30-day money-back guarantee.",
     ],
   },
   {
@@ -163,19 +163,19 @@ const localResponses: LocalMatch[] = [
   {
     pattern: (t) => /(what.*pro|pro.*include|pro.*plan|what.*get.*pro)/.test(t) && !/(family)/.test(t),
     responses: [
-      "All Scam Guard features are currently free! That includes automatic page scanning on every site you visit, fake domain detection, suspicious form warnings, link hover safety previews, community trust scores, and Gmail and Outlook email scanning. Just create a free account to get started.",
+      "Core Scam Guard protection is free! That includes automatic page scanning on the sites you visit, fake domain detection, suspicious form warnings, link hover safety previews, community trust scores, and Gmail and Outlook email scanning. Some advanced features are part of optional paid plans. Just create a free account to get started.",
     ],
   },
   {
     pattern: (t) => /(what.*family|family.*include|family.*plan|what.*get.*family)/.test(t),
     responses: [
-      "All Family features are currently free! That includes weekly safety digest reports, full scan history, a personal safety score, family member profiles, plus everything in the standard plan. Just create a free account to access all of it.",
+      "Core Family features are free, including a personal safety score, scan history, and family member profiles. Some advanced features, like weekly safety digest reports, may be part of an optional paid plan. Just create a free account to get started.",
     ],
   },
   {
     pattern: (t) => /(bundle|both.*product|complete.*protection|total.*protection|scam.*guard.*data.*shield|data.*shield.*scam.*guard)/.test(t),
     responses: [
-      "Both GCR Scam Guard and GCR Data Shield are completely free right now. No bundles needed! You get full access to all features across both products. Just create a free account and everything is yours.",
+      "Both GCR Scam Guard and GCR Data Shield have free core features, with optional paid plans for advanced protection. Just create a free account to get started, and you can upgrade anytime if you want more.",
     ],
   },
   {

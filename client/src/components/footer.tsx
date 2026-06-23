@@ -2,6 +2,7 @@ import { Shield, Lock, FileCheck } from "lucide-react";
 import { SiLinkedin, SiFacebook, SiYoutube, SiInstagram, SiWhatsapp } from "react-icons/si";
 import Link from "next/link";
 import { CookieSettingsButton } from "@/components/cookie-settings-button";
+import { DoNotSellButton } from "@/components/do-not-sell-button";
 
 const footerLinks = {
   learning: [
@@ -185,7 +186,7 @@ export function Footer() {
             </div>
             <div className="flex items-center gap-1.5 text-xs text-slate-500">
               <Shield className="w-3.5 h-3.5" />
-              <span>No Data Sold</span>
+              <span>GPC Honored</span>
             </div>
           </div>
 
@@ -199,6 +200,7 @@ export function Footer() {
               <Link href="/support" className="hover:text-slate-300 transition-colors">Support</Link>
               <Link href="/contact" className="hover:text-slate-300 transition-colors">Contact</Link>
               <CookieSettingsButton />
+              <DoNotSellButton />
             </div>
           </div>
         </div>

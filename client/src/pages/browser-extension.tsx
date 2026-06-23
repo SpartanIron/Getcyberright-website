@@ -429,7 +429,7 @@ export default function BrowserExtensionPage() {
           </div>
           <div className="space-y-4 max-w-2xl mx-auto">
             {[
-              { q: "Is the browser extension free?", a: "Yes! The extension is completely free to download and use. All features are included at no cost: automatic page scanning, notification blocking, search safety badges, redirect detection, clipboard protection, webmail scanning, and family profiles. Just create a free account to get started." },
+              { q: "Is the browser extension free?", a: "Yes, the extension is free to download and use. Core protection is included at no cost: automatic page scanning, notification blocking, search safety badges, redirect detection, clipboard protection, webmail scanning, and family profiles. Some advanced features depend on your subscription tier. Just create a free account to get started." },
               { q: "Does it track my browsing activity?", a: "No. The extension only scans content when you explicitly trigger a scan or when auto-scan is enabled. No browsing history is stored or transmitted." },
               { q: "What browsers does it work with?", a: "It works with any Chromium-based browser including Google Chrome, Brave, Microsoft Edge, Opera, and Vivaldi." },
               { q: "Is it on the Chrome Web Store?", a: "Yes! GCR Scam Guard is available on the official Chrome Web Store. Click \"Add to Chrome\" at the top of this page to install it directly. You can also download the ZIP for manual installation if you prefer." },

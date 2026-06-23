@@ -79,7 +79,7 @@ const quickLinks = [
 const faqs = [
   {
     question: "Are GetCyberRight tools free to use?",
-    answer: "Yes! Everything on GetCyberRight is completely free. All tools, features, and educational resources are available at no cost. Just create a free account to get full access."
+    answer: "Our core tools and educational resources are free to use. Just create a free account to get started. We also offer optional paid plans that unlock advanced protection, and the platform shows ads to help keep the free features free."
   },
   {
     question: "Do you store my data when I use your tools?",
