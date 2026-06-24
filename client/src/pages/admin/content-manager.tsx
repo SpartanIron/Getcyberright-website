@@ -35,6 +35,8 @@ import {
   RefreshCw,
   Pencil,
   BarChart3,
+  ShieldAlert,
+  ShieldCheck,
 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -1100,6 +1102,279 @@ function ReviewQueueTab() {
   );
 }
 
+function ProseGateTab() {
+  const { toast } = useToast();
+  const [actingId, setActingId] = useState<string | null>(null);
+
+  const { data, isLoading, isError, error, refetch, isFetching } = useQuery<{
+    stats: {
+      lastRunAt: string | null;
+      sampleSize: number;
+      sampled: number;
+      classifications: Record<string, number>;
+      blockedSampled: number;
+      proseOnlyBlockedCount: number;
+      estimatedProseFalsePositiveRate: number;
+      acknowledgedFalsePositives: number;
+      acknowledgedTruePositives: number;
+    };
+    suspects: Array<{
+      postId: string;
+      contentTitle: string;
+      contentType: string;
+      platform: string;
+      status: string;
+      classification: string;
+      reAuditVerdict: string;
+      proseFailures: Array<{ claim: string; reason: string }>;
+      otherFailures: Array<{ claim: string; kind: string; reason: string }>;
+      postContent: string;
+      acknowledgedAt: string | null;
+      acknowledgedAs: "false_positive" | "true_positive" | null;
+      createdAt: string | null;
+    }>;
+  }>({
+    queryKey: ["/api/admin/social-posts/prose-gate-stats"],
+    refetchInterval: 60000,
+  });
+
+  const runMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", "/api/admin/social-posts/prose-gate-audit", { sampleSize: 150 });
+      return res.json();
+    },
+    onSuccess: (out: any) => {
+      toast({
+        title: "Audit complete",
+        description: `Sampled ${out?.stats?.sampled ?? 0} posts. ${out?.stats?.proseOnlyBlockedCount ?? 0} blocked solely by the fabrication filter.`,
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/social-posts/prose-gate-stats"] });
+    },
+    onError: () => toast({ title: "Audit failed", variant: "destructive" }),
+  });
+
+  const ackMutation = useMutation({
+    mutationFn: async ({ id, as }: { id: string; as: "false_positive" | "true_positive" }) => {
+      setActingId(id);
+      const res = await apiRequest("POST", `/api/admin/social-posts/${id}/prose-gate-acknowledge`, { as });
+      return res.json();
+    },
+    onSuccess: (_out: any, vars) => {
+      toast({
+        title: vars.as === "false_positive" ? "Marked as false positive" : "Marked as true positive",
+        description: vars.as === "false_positive"
+          ? "Post unblocked and returned to drafts for normal review."
+          : "Filter decision confirmed. Post stays blocked.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/social-posts/prose-gate-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/social-posts"] });
+      setActingId(null);
+    },
+    onError: () => { toast({ title: "Action failed", variant: "destructive" }); setActingId(null); },
+  });
+
+  if (isLoading) return <div className="p-8 text-center text-muted-foreground">Loading fabrication-filter monitor...</div>;
+  if (isError) return <TabErrorState label="Fabrication Filter" error={error} onRetry={() => refetch()} isRetrying={isFetching} />;
+
+  const stats = data?.stats;
+  const suspects = data?.suspects ?? [];
+  const fpRate = stats ? (stats.estimatedProseFalsePositiveRate * 100).toFixed(1) : "0.0";
+  const ackTotal = (stats?.acknowledgedFalsePositives || 0) + (stats?.acknowledgedTruePositives || 0);
+  const confirmedFpRate = ackTotal > 0
+    ? (((stats?.acknowledgedFalsePositives || 0) / ackTotal) * 100).toFixed(1)
+    : null;
+
+  return (
+    <div className="space-y-4">
+      <Card>
+        <CardHeader>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <ShieldAlert className="w-5 h-5" /> Fabrication Filter Monitor
+              </CardTitle>
+              <p className="text-xs text-muted-foreground">
+                Re-runs the claim auditor against recent posts to catch posts the new prose-grounding gate may be blocking unfairly.
+                Last run: {stats?.lastRunAt ? new Date(stats.lastRunAt).toLocaleString() : "never"}.
+              </p>
+            </div>
+            <Button
+              size="sm"
+              onClick={() => runMutation.mutate()}
+              disabled={runMutation.isPending}
+              data-testid="button-run-prose-gate-audit"
+            >
+              {runMutation.isPending ? (
+                <><RefreshCw className="w-3.5 h-3.5 mr-1 animate-spin" /> Sampling…</>
+              ) : (
+                <><RefreshCw className="w-3.5 h-3.5 mr-1" /> Re-run audit</>
+              )}
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <StatBox label="Posts sampled" value={stats?.sampled ?? 0} testid="stat-prose-sampled" />
+            <StatBox label="Currently blocked" value={stats?.blockedSampled ?? 0} testid="stat-prose-blocked" />
+            <StatBox
+              label="Blocked by prose gate alone"
+              value={stats?.proseOnlyBlockedCount ?? 0}
+              testid="stat-prose-only"
+              tone={(stats?.proseOnlyBlockedCount ?? 0) > 0 ? "warn" : "ok"}
+            />
+            <StatBox
+              label="Estimated FP rate"
+              value={`${fpRate}%`}
+              testid="stat-prose-fp-rate"
+              tone={(stats?.estimatedProseFalsePositiveRate ?? 0) > 0.1 ? "warn" : "ok"}
+            />
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-3">
+            <StatBox
+              label="Confirmed false positives"
+              value={stats?.acknowledgedFalsePositives ?? 0}
+              testid="stat-confirmed-fp"
+            />
+            <StatBox
+              label="Confirmed true positives"
+              value={stats?.acknowledgedTruePositives ?? 0}
+              testid="stat-confirmed-tp"
+            />
+            <StatBox
+              label="Confirmed FP share"
+              value={confirmedFpRate ? `${confirmedFpRate}%` : "—"}
+              testid="stat-confirmed-fp-rate"
+            />
+            <StatBox
+              label="Mixed-block (prose + other)"
+              value={stats?.classifications?.mixed_block ?? 0}
+              testid="stat-mixed-block"
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Eye className="w-4 h-4" /> Suspect posts ({suspects.length})
+          </CardTitle>
+          <p className="text-xs text-muted-foreground">
+            Blocked posts whose only audit failure comes from the new fabrication filter, plus posts that would now pass on re-audit. Confirm whether the filter was right.
+          </p>
+        </CardHeader>
+        <CardContent>
+          {suspects.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-6" data-testid="text-no-prose-suspects">
+              No suspect posts. The fabrication filter is in agreement with the rest of the auditor for this sample.
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {suspects.map((s) => (
+                <div
+                  key={s.postId}
+                  className="border rounded-md p-3 space-y-2"
+                  data-testid={`prose-suspect-${s.postId}`}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="font-medium text-sm truncate" data-testid={`text-suspect-title-${s.postId}`}>
+                        {s.contentTitle}
+                      </div>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        <Badge variant="outline" className="text-xs">{s.platform}</Badge>
+                        <Badge variant="outline" className="text-xs">{s.contentType}</Badge>
+                        <Badge variant="secondary" className="text-xs">{s.classification}</Badge>
+                        <Badge variant={s.reAuditVerdict === "pass" ? "default" : "destructive"} className="text-xs">
+                          re-audit: {s.reAuditVerdict}
+                        </Badge>
+                        {s.acknowledgedAs && (
+                          <Badge
+                            variant={s.acknowledgedAs === "false_positive" ? "default" : "secondary"}
+                            className="text-xs"
+                            data-testid={`badge-acknowledged-${s.postId}`}
+                          >
+                            {s.acknowledgedAs === "false_positive" ? "Confirmed FP" : "Confirmed TP"}
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                    {!s.acknowledgedAs && (
+                      <div className="flex items-center gap-2 shrink-0">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => ackMutation.mutate({ id: s.postId, as: "false_positive" })}
+                          disabled={actingId === s.postId}
+                          data-testid={`button-mark-fp-${s.postId}`}
+                        >
+                          <ShieldCheck className="w-3.5 h-3.5 mr-1" /> Filter wrong, unblock
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => ackMutation.mutate({ id: s.postId, as: "true_positive" })}
+                          disabled={actingId === s.postId}
+                          data-testid={`button-mark-tp-${s.postId}`}
+                        >
+                          <CheckCircle className="w-3.5 h-3.5 mr-1" /> Filter right, keep blocked
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                  {s.proseFailures.length > 0 && (
+                    <div className="text-xs">
+                      <div className="font-semibold text-amber-700 dark:text-amber-400 mb-1">Prose-gate flagged sentences:</div>
+                      <ul className="list-disc pl-5 space-y-1">
+                        {s.proseFailures.slice(0, 3).map((f, i) => (
+                          <li key={i} className="text-muted-foreground" data-testid={`text-prose-failure-${s.postId}-${i}`}>
+                            "{f.claim}"
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  <details className="text-xs">
+                    <summary className="cursor-pointer text-muted-foreground">Show full post</summary>
+                    <pre className="mt-2 p-2 bg-muted rounded whitespace-pre-wrap font-mono text-xs" data-testid={`text-suspect-content-${s.postId}`}>
+                      {s.postContent}
+                    </pre>
+                  </details>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function StatBox({
+  label,
+  value,
+  testid,
+  tone = "neutral",
+}: {
+  label: string;
+  value: string | number;
+  testid: string;
+  tone?: "neutral" | "ok" | "warn";
+}) {
+  const toneClass =
+    tone === "warn"
+      ? "border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-700"
+      : tone === "ok"
+      ? "border-emerald-200 bg-emerald-50 dark:bg-emerald-950/30 dark:border-emerald-800"
+      : "";
+  return (
+    <div className={`rounded-md border p-3 ${toneClass}`} data-testid={testid}>
+      <div className="text-xs text-muted-foreground">{label}</div>
+      <div className="text-2xl font-semibold mt-1">{value}</div>
+    </div>
+  );
+}
+
 export default function AdminContentManager() {
   const { user, isLoading: authLoading } = useAuth();
   const [, setLocation] = useLocation();
@@ -1130,18 +1405,20 @@ export default function AdminContentManager() {
         </div>
 
         <Tabs defaultValue="guides" className="w-full">
-          <TabsList className="grid w-full grid-cols-5" data-testid="tabs-content-manager">
+          <TabsList className="grid w-full grid-cols-6" data-testid="tabs-content-manager">
             <TabsTrigger value="guides" data-testid="tab-guides">Guides</TabsTrigger>
             <TabsTrigger value="scam-intel" data-testid="tab-scam-intel">Scam Intel</TabsTrigger>
             <TabsTrigger value="alerts" data-testid="tab-alerts">Alerts</TabsTrigger>
             <TabsTrigger value="review-queue" data-testid="tab-review-queue">Review Queue</TabsTrigger>
             <TabsTrigger value="social" data-testid="tab-social">Social Posts</TabsTrigger>
+            <TabsTrigger value="prose-gate" data-testid="tab-prose-gate">Fabrication Filter</TabsTrigger>
           </TabsList>
           <TabsContent value="guides"><GuidesTab /></TabsContent>
           <TabsContent value="scam-intel"><ScamIntelTab /></TabsContent>
           <TabsContent value="alerts"><AlertsTab /></TabsContent>
           <TabsContent value="review-queue"><ReviewQueueTab /></TabsContent>
           <TabsContent value="social"><SocialPostsTab /></TabsContent>
+          <TabsContent value="prose-gate"><ProseGateTab /></TabsContent>
         </Tabs>
       </div>
     </AdminLayout>

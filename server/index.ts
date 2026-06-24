@@ -353,6 +353,10 @@ function startBackgroundJobs() {
     startReviewSweeper();
   }).catch(err => console.error("Failed to start social review sweeper:", err));
 
+  import("./proseGateMonitor").then(({ startProseGateMonitor }) => {
+    startProseGateMonitor();
+  }).catch(err => console.error("Failed to start prose-gate monitor:", err));
+
   import("./engagementDiscoveryService").then(({ startEngagementDiscoveryScheduler }) => {
     startEngagementDiscoveryScheduler();
   }).catch(err => console.error("Failed to start engagement discovery scheduler:", err));

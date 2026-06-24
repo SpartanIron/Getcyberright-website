@@ -1403,6 +1403,50 @@ export function registerPlatformRoutes(app: Express): void {
     }
   });
 
+  // ─── Prose-gate monitor (task #43) ──────────────────────────────────
+  // Validates the new plain-prose grounding gate against real generated posts
+  // so admins can spot false positives before the gate silently kills good
+  // content. Stats + suspect queue are surfaced in the admin Content Manager.
+
+  app.get("/api/admin/social-posts/prose-gate-stats", isAuthenticated, isAdminMiddleware, async (_req: Request, res: Response) => {
+    try {
+      const { getProseGateStats, getProseGateSuspects } = await import("./proseGateMonitor");
+      res.json({ stats: getProseGateStats(), suspects: getProseGateSuspects() });
+    } catch (error: any) {
+      res.status(500).json({ error: error?.message || "Failed to fetch prose-gate stats" });
+    }
+  });
+
+  app.post("/api/admin/social-posts/prose-gate-audit", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const { runProseGateAudit, getProseGateSuspects } = await import("./proseGateMonitor");
+      const sampleSize = Number(req.body?.sampleSize) || 150;
+      const stats = await runProseGateAudit({ sampleSize, mutateSuspects: true });
+      res.json({ stats, suspects: getProseGateSuspects() });
+    } catch (error: any) {
+      res.status(500).json({ error: error?.message || "Failed to run prose-gate audit" });
+    }
+  });
+
+  app.post("/api/admin/social-posts/:id/prose-gate-acknowledge", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const ackSchema = z.object({ as: z.enum(["false_positive", "true_positive"]) });
+      const parsed = ackSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({
+          error: "Invalid 'as' value. Must be exactly 'false_positive' or 'true_positive'.",
+          details: parsed.error.errors,
+        });
+      }
+      const { acknowledgeSuspect, getProseGateStats, getProseGateSuspects } = await import("./proseGateMonitor");
+      const result = await acknowledgeSuspect(req.params.id, parsed.data.as);
+      if (!result.ok) return res.status(400).json({ error: result.error });
+      res.json({ ok: true, suspect: result.suspect, stats: getProseGateStats(), suspects: getProseGateSuspects() });
+    } catch (error: any) {
+      res.status(500).json({ error: error?.message || "Failed to acknowledge suspect" });
+    }
+  });
+
   app.get("/api/admin/social-posts/empty-cycles", isAuthenticated, isAdminMiddleware, async (_req: Request, res: Response) => {
     try {
       const { getEmptyCycleEvents, getEmptyCycleStats } = await import("./socialDistributionService");
