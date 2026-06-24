@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, MapPin, Shield, AlertTriangle, ShieldCheck, Eye } from "lucide-react";
-import { Link, useLocation } from "@/lib/navigation";
+import { ArrowRight, MapPin, Shield, ShieldCheck, Eye } from "lucide-react";
+import { Link } from "@/lib/navigation";
 import { useQuery } from "@tanstack/react-query";
 import type { TrendingThreat } from "@shared/schema";
-import heroFamilyImg from "@/assets/images/hero-family-protected.webp";
+import heroFamilyImg from "@/assets/images/hero-breaking-news.png";
 import { imgSrc } from "@/lib/img-src";
 
 const TIMEZONE_REGION_MAP: Record<string, string> = {
@@ -120,50 +120,47 @@ const severityColors: Record<string, string> = {
   low: "bg-slate-500/20 text-slate-400 border-slate-500/30",
 };
 
-function ThreatAlertBar() {
-  const region = useMemo(() => detectRegion(), []);
-  const regionLabel = REGION_LABELS[region] || "your region";
-  const { data } = useQuery<{ threats: TrendingThreat[] }>({
-    queryKey: [`/api/trending-threats?region=${region}`],
-    staleTime: 5 * 60 * 1000,
-  });
-
-  const threat = data?.threats?.[0];
-  if (!threat) return null;
-  const sevClass = severityColors[threat.severity] || severityColors.medium;
-
+function BreakingBadge({ severity, regionLabel }: { severity: string; regionLabel: string }) {
+  const sevClass = severityColors[severity] || severityColors.medium;
   return (
-    <Link href="/alerts">
-      <div
-        className="inline-flex items-center gap-2 sm:gap-2.5 bg-red-500/[0.08] border border-red-500/20 rounded-full px-3 sm:px-4 py-2 cursor-pointer hover:bg-red-500/[0.12] transition-colors group max-w-full"
-        data-testid="badge-live-threat"
-      >
-        <div className="relative flex-shrink-0">
-          <AlertTriangle className="w-3.5 h-3.5 text-red-400" />
-        </div>
-        <span className="flex items-center gap-1.5 flex-shrink-0">
-          <span className="relative flex h-2 w-2 flex-shrink-0">
-            <span className="animate-ping motion-reduce:animate-none absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
-          </span>
-          <span className="text-xs font-semibold text-red-400 uppercase tracking-wider">Active</span>
+    <div
+      className="inline-flex items-center gap-2 sm:gap-2.5 bg-red-500/[0.1] border border-red-500/25 rounded-full pl-2.5 pr-3 py-1.5"
+      data-testid="badge-live-threat"
+    >
+      <span className="flex items-center gap-1.5 flex-shrink-0">
+        <span className="relative flex h-2 w-2 flex-shrink-0">
+          <span className="animate-ping motion-reduce:animate-none absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
         </span>
-        <span className="text-sm text-foreground/70 font-medium truncate min-w-0 group-hover:text-foreground transition-colors">
-          {threat.title}
-        </span>
-        <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border flex-shrink-0 ${sevClass}`}>
-          {threat.severity}
-        </span>
-      </div>
-    </Link>
+        <span className="text-xs font-bold text-red-400 uppercase tracking-wider">Breaking</span>
+      </span>
+      <span className="h-3 w-px bg-red-500/30 flex-shrink-0" />
+      <span className="flex items-center gap-1 text-xs font-medium text-hero-foreground/70">
+        <MapPin className="w-3 h-3" /> {regionLabel}
+      </span>
+      <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border flex-shrink-0 ${sevClass}`}>
+        {severity}
+      </span>
+    </div>
   );
 }
 
 export function HeroSection() {
   const [heroCopy, setHeroCopy] = useState<HeroCopy>(HERO_COPY_ROTATION[0]);
+  const [region, setRegion] = useState<string | null>(null);
   useEffect(() => {
     setHeroCopy(getWeeklyHeroCopy());
+    setRegion(detectRegion());
   }, []);
+
+  const regionLabel = region ? (REGION_LABELS[region] || "your region") : "Worldwide";
+  const { data: threatData } = useQuery<{ threats: TrendingThreat[] }>({
+    queryKey: [`/api/trending-threats?region=${region}`],
+    enabled: !!region,
+    staleTime: 5 * 60 * 1000,
+  });
+  const threat = threatData?.threats?.[0];
+  const evergreenLine = `${heroCopy.line1} ${heroCopy.line2} ${heroCopy.accent}`;
   return (
     <section className="relative w-full" data-testid="section-hero">
       <div className="bg-hero relative overflow-hidden">
@@ -252,26 +249,52 @@ export function HeroSection() {
         <div className="relative max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-[42%_58%] gap-8 lg:gap-10 items-center py-12 sm:py-16 lg:py-20">
             <div className="max-w-xl min-w-0">
-              <div className="mb-6 overflow-hidden">
-                <ThreatAlertBar />
-              </div>
-              <h1
-                className="text-[2rem] sm:text-6xl lg:text-[4.5rem] font-extrabold tracking-tight text-hero-foreground leading-[1.05] mb-6 sm:mb-8"
-                data-testid="text-hero-heading"
-              >
-                {heroCopy.line1}
-                <br />
-                {heroCopy.line2}
-                <br />
-                <span className="hero-gradient-text">{heroCopy.accent}</span>
-              </h1>
-
-              <p
-                className="text-base sm:text-xl text-hero-foreground/80 leading-relaxed mb-8 sm:mb-10"
-                data-testid="text-hero-subtext"
-              >
-                {heroCopy.subtext}
-              </p>
+              {threat ? (
+                <>
+                  <div className="mb-5 flex flex-wrap items-center gap-3">
+                    <BreakingBadge severity={threat.severity} regionLabel={regionLabel} />
+                    {threat.source && (
+                      <span className="text-xs text-hero-foreground/50 font-medium">
+                        via {threat.source}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-sm font-semibold uppercase tracking-wider hero-gradient-text mb-3" data-testid="text-hero-eyebrow">
+                    {evergreenLine}
+                  </p>
+                  <h1
+                    className="text-[1.75rem] sm:text-4xl lg:text-[3.25rem] font-extrabold tracking-tight text-hero-foreground leading-[1.08] mb-5 sm:mb-6 break-words"
+                    data-testid="text-hero-heading"
+                  >
+                    {threat.title}
+                  </h1>
+                  <p
+                    className="text-base sm:text-lg text-hero-foreground/80 leading-relaxed mb-8 sm:mb-9 line-clamp-4"
+                    data-testid="text-hero-subtext"
+                  >
+                    {threat.summary}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <h1
+                    className="text-[2rem] sm:text-6xl lg:text-[4.5rem] font-extrabold tracking-tight text-hero-foreground leading-[1.05] mb-6 sm:mb-8"
+                    data-testid="text-hero-heading"
+                  >
+                    {heroCopy.line1}
+                    <br />
+                    {heroCopy.line2}
+                    <br />
+                    <span className="hero-gradient-text">{heroCopy.accent}</span>
+                  </h1>
+                  <p
+                    className="text-base sm:text-xl text-hero-foreground/80 leading-relaxed mb-8 sm:mb-10"
+                    data-testid="text-hero-subtext"
+                  >
+                    {heroCopy.subtext}
+                  </p>
+                </>
+              )}
 
               <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-4 mb-8 sm:mb-10">
                 <Button
@@ -280,13 +303,13 @@ export function HeroSection() {
                   className="bg-accent text-accent-foreground border-accent-border font-semibold px-8 text-base shadow-[0_4px_24px_-4px] shadow-accent/40 hover:shadow-[0_6px_32px_-4px] hover:shadow-accent/50 hover:scale-[1.02] transition-all duration-300 w-full sm:w-auto"
                   data-testid="button-hero-primary-cta"
                 >
-                  <Link href="/scam-checker">
-                    Check a Scam Now
+                  <Link href="/alerts">
+                    {threat ? "Check if you're affected" : "See latest threats"}
                     <ArrowRight className="ml-2 w-5 h-5 cta-arrow-right" />
                   </Link>
                 </Button>
-                <Link href="/tools" className="inline-flex items-center gap-2 text-base text-hero-foreground/70 hover:text-hero-foreground/90 transition-colors group font-medium">
-                  See all protection tools
+                <Link href="/scam-checker" className="inline-flex items-center gap-2 text-base text-hero-foreground/70 hover:text-hero-foreground/90 transition-colors group font-medium">
+                  Check a scam now
                   <ArrowRight className="w-4 h-4 cta-arrow-right" />
                 </Link>
               </div>
