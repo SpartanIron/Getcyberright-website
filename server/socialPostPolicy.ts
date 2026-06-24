@@ -26,6 +26,15 @@ export const PLATFORM_POLICIES: Record<string, PlatformPolicy> = {
     maxParagraphs: 4,
     sentencesPerParagraph: 2,
   },
+  // X (Twitter) is character-bound, not word-bound. The wordLimit is set high so
+  // the word-trim step never fires; the real 280-char cap is applied by
+  // enforceTweetLimit() at publish time.
+  x: {
+    wordLimit: 280,
+    maxConsecutiveLineBreaks: 2,
+    maxParagraphs: 4,
+    sentencesPerParagraph: 2,
+  },
 };
 
 const DEPTH_OVERRIDES: Record<PostDepth, Record<string, Partial<PlatformPolicy>>> = {
@@ -421,4 +430,150 @@ export function validatePostContent(
   }
 
   return { ok: issues.length === 0, issues };
+}
+
+// ---------------------------------------------------------------------------
+// Publish-time per-platform formatting
+// ---------------------------------------------------------------------------
+// These run at the publish chokepoint (server/bufferPublisher.ts) so they apply
+// uniformly no matter which generation engine produced the post.
+
+function tidyWhitespace(text: string): string {
+  return text
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .replace(/\s+([.!?,;:])/g, "$1")
+    .trim();
+}
+
+/**
+ * Remove all #hashtags. LinkedIn / Facebook / X bodies read as spam with hashtag
+ * stacks; native copy with zero hashtags earns more reach on those platforms.
+ */
+export function stripHashtags(text: string): string {
+  return tidyWhitespace(text.replace(/(^|\s)#[A-Za-z0-9_]+/g, "$1"));
+}
+
+/**
+ * Keep at most `max` hashtags (Instagram). Extra tags beyond the cap are dropped.
+ */
+export function limitHashtags(text: string, max: number): string {
+  let count = 0;
+  const out = text.replace(/#[A-Za-z0-9_]+/g, (tag) => {
+    count += 1;
+    return count <= max ? tag : "";
+  });
+  return tidyWhitespace(out);
+}
+
+/**
+ * Instagram links are not tappable in the caption. Replace the verify URL with
+ * bio phrasing and strip any remaining raw URLs so the caption stays clean.
+ */
+export function instagramizeLinks(text: string): string {
+  let out = text.replace(/Verify:\s*\S+/gi, "Full sources linked in our bio.");
+  out = out.replace(/https?:\/\/\S+/gi, "");
+  out = out.replace(/\b(?:www\.)?getcyberright\.com\/\S*/gi, "");
+  out = tidyWhitespace(out);
+  if (!/\bbio\b/i.test(out)) {
+    out += "\n\nMore at getcyberright.com";
+  }
+  return out;
+}
+
+/**
+ * Hard 280-character cap for X. Preserves a single trailing verify/canonical URL
+ * (X surfaces it as the citation) and drops the verbose "Source: ... Verify:"
+ * receipt prose, which never fits a tweet. Truncates the body at a sentence or
+ * word boundary so the tweet never reads as cut off mid-word.
+ */
+function truncateBodyToBudget(body: string, budget: number): string {
+  if (budget <= 0) return "";
+  if (body.length <= budget) return body;
+  let cut = body.slice(0, budget);
+  const lastStop = Math.max(cut.lastIndexOf(". "), cut.lastIndexOf("! "), cut.lastIndexOf("? "));
+  if (lastStop > budget * 0.5) {
+    cut = cut.slice(0, lastStop + 1);
+  } else {
+    const ellipsisBudget = budget - 3;
+    cut = cut.slice(0, Math.max(0, ellipsisBudget));
+    const lastSpace = cut.lastIndexOf(" ");
+    if (lastSpace > 0) cut = cut.slice(0, lastSpace);
+    cut = cut.replace(/[.,;:!?\-]+$/, "") + (ellipsisBudget > 0 ? "..." : "");
+  }
+  return cut.trim();
+}
+
+export function enforceTweetLimit(text: string, limit = 280): string {
+  if (text.length <= limit) return text;
+
+  const urlMatches = text.match(/https?:\/\/\S+|(?:www\.)?getcyberright\.com\/[^\s]*/gi) || [];
+  const tail = urlMatches.length ? urlMatches[urlMatches.length - 1].replace(/[.,;:!?)]+$/, "") : "";
+
+  let body = text.replace(/\n+\s*Source:[\s\S]*$/i, "").trim();
+  body = body
+    .replace(/https?:\/\/\S+/gi, "")
+    .replace(/\b(?:www\.)?getcyberright\.com\/[^\s]*/gi, "");
+  body = tidyWhitespace(body);
+
+  const tailPart = tail ? `\n\n${tail}` : "";
+  let result: string;
+
+  // Only keep the URL tail if it actually leaves room for some body text.
+  // A URL so long it would blow the limit on its own is useless in a tweet, so
+  // we drop it and use the full budget for the body instead.
+  if (tail && tailPart.length < limit) {
+    const truncated = truncateBodyToBudget(body, limit - tailPart.length);
+    result = `${truncated}${tailPart}`.trim();
+  } else {
+    result = truncateBodyToBudget(body, limit);
+  }
+
+  // Absolute safety net: never return more than `limit` characters, no matter
+  // what the URL/body lengths were.
+  if (result.length > limit) {
+    result = result.slice(0, limit).trim();
+  }
+  return result;
+}
+
+/**
+ * Strip stale year stamps from a headline so cards/titles stay evergreen.
+ * Only removes a trailing year that is OLDER than the current year (e.g.
+ * "Latest Scams 2024" -> "Latest Scams"); the current year is left intact.
+ */
+export function evergreenTitle(title: string, currentYear = new Date().getFullYear()): string {
+  if (!title) return title;
+  return title
+    .replace(/\s+(?:for|in)\s+(20[0-2]\d)\s*$/i, (mm, y) => (Number(y) < currentYear ? "" : mm))
+    .replace(/\s*[:\-(]\s*(20[0-2]\d)\s*\)?\s*$/i, (mm, y) => (Number(y) < currentYear ? "" : mm))
+    .replace(/\s+(20[0-2]\d)\s*$/i, (mm, y) => (Number(y) < currentYear ? "" : mm))
+    .trim();
+}
+
+/**
+ * Publish-time formatter applied at the Buffer chokepoint. Uses a permissive
+ * depth so already-shaped insight/deep_value posts are NOT re-trimmed to the
+ * wire word limit, then layers per-platform rules: hashtag policy, Instagram
+ * link handling, and the X 280-char cap.
+ */
+export function formatForPublish(text: string, platform: string): string {
+  let content = enforcePostPolicy(text, platform, "deep_value").content;
+
+  if (platform === "linkedin" || platform === "facebook" || platform === "x") {
+    content = stripHashtags(content);
+  } else if (platform === "instagram") {
+    content = limitHashtags(content, 10);
+  }
+
+  if (platform === "instagram") {
+    content = instagramizeLinks(content);
+  }
+
+  if (platform === "x") {
+    content = enforceTweetLimit(content, 280);
+  }
+
+  return content;
 }

@@ -6,7 +6,7 @@ import { generateBrandedImage, generateStatCard, serveImagePath } from "./social
 import { getBufferChannelsByPlatform } from "./bufferPublisher";
 import { tagAllGcrLinks, tagSingleUrl, buildCampaignId, ensureGcrLink } from "./utmTracking";
 import { buildPartnerContext } from "./socialEngagementService";
-import { enforceAndSanitize, sanitizeContent, validatePostContent } from "./socialPostPolicy";
+import { enforceAndSanitize, sanitizeContent, validatePostContent, type PostDepth } from "./socialPostPolicy";
 import { searchStockPhoto, downloadSourceImage, applyBrandOverlay } from "./stockPhotoService";
 import type { ImageSource } from "./socialImageSource";
 import type { TemplateStyle } from "./stockPhotoService";
@@ -61,8 +61,9 @@ async function persistAuditedPost(args: {
   imagePath: string | null;
   imageSource: ImageSource | null;
   utmCampaign: string;
+  depth?: PostDepth;
 }): Promise<string | null> {
-  const { bundle, contentType, build, hashtags, imagePath, imageSource, utmCampaign } = args;
+  const { bundle, contentType, build, hashtags, imagePath, imageSource, utmCampaign, depth } = args;
   const state = deriveAuditedPostState(build.audit);
   const auditPassed = state.auditVerdict === "pass";
   const status = state.status;
@@ -98,6 +99,7 @@ async function persistAuditedPost(args: {
     auditFailures: build.audit.failures,
     imageSource: imageSource || undefined,
     publishError: state.publishError,
+    postStyle: depth,
   };
   const created = await storage.createSocialPost(post);
   if (!auditPassed) {
@@ -141,7 +143,8 @@ async function generateSocialPosts(
   description: string,
   url: string,
   tags: string[],
-  educationalContext: string
+  educationalContext: string,
+  depth: PostDepth = "wire"
 ): Promise<SocialPostSet | null> {
   try {
     const response = await anthropic.messages.create({
@@ -294,10 +297,10 @@ Format as JSON:
     if (!validated.success) {
       console.warn("[SocialDistribution] AI output validation issues:", validated.error.issues.map(i => `${i.path}: ${i.message}`).join(", "));
       return {
-        linkedin: enforceAndSanitize(parsed.linkedin || "", "linkedin"),
-        facebook: enforceAndSanitize(parsed.facebook || parsed.linkedin || "", "facebook"),
+        linkedin: enforceAndSanitize(parsed.linkedin || "", "linkedin", depth),
+        facebook: enforceAndSanitize(parsed.facebook || parsed.linkedin || "", "facebook", depth),
         xThread: Array.isArray(parsed.xThread) ? parsed.xThread.map((t: string) => sanitizeContent(t)) : [],
-        instagram: enforceAndSanitize(parsed.instagram || "", "instagram"),
+        instagram: enforceAndSanitize(parsed.instagram || "", "instagram", depth),
         shortAlert: sanitizeContent(parsed.shortAlert || ""),
         hashtags: Array.isArray(parsed.hashtags) ? parsed.hashtags : [],
       };
@@ -305,10 +308,10 @@ Format as JSON:
 
     const data = validated.data;
     return {
-      linkedin: enforceAndSanitize(data.linkedin, "linkedin"),
-      facebook: enforceAndSanitize(data.facebook, "facebook"),
+      linkedin: enforceAndSanitize(data.linkedin, "linkedin", depth),
+      facebook: enforceAndSanitize(data.facebook, "facebook", depth),
       xThread: data.xThread.map((t: string) => sanitizeContent(t)),
-      instagram: enforceAndSanitize(data.instagram, "instagram"),
+      instagram: enforceAndSanitize(data.instagram, "instagram", depth),
       shortAlert: sanitizeContent(data.shortAlert),
       hashtags: data.hashtags,
     };
@@ -471,6 +474,7 @@ export async function distributeGuideContent(guide: CyberSafetyGuide): Promise<s
   const bundle = buildGuideBundle(guide);
   const url = bundle.canonicalUrl;
   { const sub = isBundleSubstantive(bundle); if (!sub.ok) { console.warn(`[SocialDistribution] SKIP guide "${guide.title}": ${sub.reason}`); recordEmptyCycle("guide", guide.title, sub.reason); return []; } }
+  const guideDepth: PostDepth = "deep_value";
   const posts = await generateSocialPosts(
     "cybersecurity guide",
     guide.title,
@@ -478,6 +482,7 @@ export async function distributeGuideContent(guide: CyberSafetyGuide): Promise<s
     url,
     guide.tags || [],
     bundle.contextForLLM,
+    guideDepth,
   );
 
   if (!posts) {
@@ -521,6 +526,7 @@ export async function distributeGuideContent(guide: CyberSafetyGuide): Promise<s
       imagePath,
       imageSource: imagePath ? "branded_card" : null,
       utmCampaign: campaignId,
+      depth: guideDepth,
     });
     if (id) createdIds.push(id);
   }
@@ -533,6 +539,7 @@ export async function distributeThreatAlertContent(alert: CyberThreatAlert): Pro
   const bundle = buildAlertBundle(alert);
   const url = bundle.canonicalUrl;
   { const sub = isBundleSubstantive(bundle); if (!sub.ok) { console.warn(`[SocialDistribution] SKIP alert "${alert.threatName}": ${sub.reason}`); recordEmptyCycle("alert", alert.threatName, sub.reason); return []; } }
+  const alertDepth: PostDepth = "wire";
   const posts = await generateSocialPosts(
     "cyber threat alert",
     alert.threatName,
@@ -540,6 +547,7 @@ export async function distributeThreatAlertContent(alert: CyberThreatAlert): Pro
     url,
     alert.affectedPlatforms || [],
     bundle.contextForLLM,
+    alertDepth,
   );
 
   if (!posts) {
@@ -583,6 +591,7 @@ export async function distributeThreatAlertContent(alert: CyberThreatAlert): Pro
       imagePath,
       imageSource: imagePath ? "branded_card" : null,
       utmCampaign: alertCampaignId,
+      depth: alertDepth,
     });
     if (id) createdIds.push(id);
   }
@@ -595,6 +604,7 @@ export async function distributeScamIntelContent(scam: ScamIntelligence): Promis
   const bundle = buildScamBundle(scam);
   const url = bundle.canonicalUrl;
   { const sub = isBundleSubstantive(bundle); if (!sub.ok) { console.warn(`[SocialDistribution] SKIP scam "${scam.scamName}": ${sub.reason}`); recordEmptyCycle("scam_intel", scam.scamName, sub.reason); return []; } }
+  const scamDepth: PostDepth = "insight";
   const posts = await generateSocialPosts(
     "scam intelligence report",
     scam.scamName,
@@ -602,6 +612,7 @@ export async function distributeScamIntelContent(scam: ScamIntelligence): Promis
     url,
     scam.platformUsed || [],
     bundle.contextForLLM,
+    scamDepth,
   );
 
   if (!posts) {
@@ -645,6 +656,7 @@ export async function distributeScamIntelContent(scam: ScamIntelligence): Promis
       imagePath,
       imageSource: imagePath ? "branded_card" : null,
       utmCampaign: scamCampaignId,
+      depth: scamDepth,
     });
     if (id) createdIds.push(id);
   }

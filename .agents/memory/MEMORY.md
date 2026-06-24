@@ -1,5 +1,4 @@
 # Memory Index
 
-- [Bootstrap failure freezes schedulers](bootstrap-failure-freezes-schedulers.md) — a bad Express/Next route pattern crashes bootstrap, leaving the app at 503 and ALL background jobs unstarted; path-to-regexp v8 rejects `:id*`.
-- [Dev tooling quirks](dev-tooling-quirks.md) — psql CLI hangs (use executeSql), `tsc --noEmit` times out, server edits need workflow restart, first request after restart shows a slow warmup splash.
-- [GetCyberRight env quirks](getcyberright-env-quirks.md) — bash redacts words like "free"; use read for exact strings; many client/src/pages are dead wrappers; platform is ad+paid, not free.
+- [Social publish-time formatting](social-publish-formatting.md) — per-platform rules live at the Buffer chokepoint; X char-cap must survive a URL longer than the budget; empty-body gate must strip the citation receipt first.
+- [Shield-security test flakiness](shield-security-test-flakiness.md) — its 3-request rate-limit budget makes repeated runs report 429 instead of 400; restart the server to reset. A separate pre-existing `/api/shield/start-trial` 404 fails the suite regardless.

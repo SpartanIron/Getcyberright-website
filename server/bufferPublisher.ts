@@ -1,7 +1,7 @@
 import { storage } from "./storage";
 import * as path from "path";
 import * as fs from "fs";
-import { enforcePostPolicy } from "./socialPostPolicy";
+import { enforcePostPolicy, formatForPublish, evergreenTitle } from "./socialPostPolicy";
 import { runSocialQualityGate } from "./socialQualityGate";
 import { validateAndPreparePost } from "./linkValidator";
 
@@ -194,7 +194,8 @@ async function resolveImageUrl(
     const templateStyle = contentType === "threat_alert" ? "alert_card" as const
       : contentType === "scam_intel" ? "stat_card" as const
       : "insight_card" as const;
-    const headline = contentTitle.length > 50 ? contentTitle.slice(0, 47) + "..." : contentTitle;
+    const evergreenedTitle = evergreenTitle(contentTitle);
+    const headline = evergreenedTitle.length > 50 ? evergreenedTitle.slice(0, 47) + "..." : evergreenedTitle;
     const dims = platform === "instagram" ? { w: 1080, h: 1080 } : { w: 1200, h: 630 };
 
     const stockPhoto = await searchStockPhoto(contentType || "default", contentTitle, { platform });
@@ -238,8 +239,7 @@ function prepareContent(
   text: string,
   platform: string,
 ): string {
-  const { content } = enforcePostPolicy(text, platform);
-  return content;
+  return formatForPublish(text, platform);
 }
 
 function shouldAttachImage(platform: string, content: string): boolean {

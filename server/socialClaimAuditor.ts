@@ -115,20 +115,35 @@ function extractClaims(text: string): ExtractedClaim[] {
   const STOPWORDS = new Set([
     "The","A","An","This","That","These","Those","Our","Your","Their","His","Her","Its",
     "Source","Sources","Full","Watch","Tip","Tips","Update","Alert","Warning","Family",
-    "Stay","Keep","Visit","Read","Learn","Get","Cyber","Right","GetCyberRight","Source:",
+    "Stay","Keep","Visit","Read","Learn","Get","Cyber","Right","GetCyberRight","Source:","Verify",
+    "Most","Many","Some","Every","Everyone","Everything","Someone","Anyone","Nobody","People",
+    "Here","Here's","There","Then","Now","Today","Yesterday","Tomorrow","Yes","No","So","But","And",
+    "Why","What","When","Where","How","Who","If","Plus","Also","Even","Still","Just","Both","Either",
     "Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday",
     "January","February","March","April","May","June","July","August","September","October","November","December",
   ]);
+  // Org-suffix signal: a 2-word Title-Case pair is only treated as a named org
+  // when it carries an org suffix; otherwise generic pairs like "Perfect English"
+  // or "Online Safety" are not company claims and must not be force-verified.
+  const ORG_SUFFIX =
+    /^(Inc|Corp|Corporation|Ltd|LLC|Group|Bank|Hospital|University|Holdings|Healthcare|Systems|Networks|Solutions|Technologies|Industries|Agency|Bureau|Department|Institute|Foundation|Labs|Telecom)$/;
   const properNounRe = /\b([A-Z][A-Za-z0-9.&'\-]+(?:\s+[A-Z][A-Za-z0-9.&'\-]+){1,3})\b/g;
-  while ((m = properNounRe.exec(text)) !== null) {
-    const phrase = m[0].trim();
-    const tokens = phrase.split(/\s+/);
-    if (tokens.every((t) => STOPWORDS.has(t))) continue;
-    if (/^[A-Z][a-z]+$/.test(tokens[0]) && tokens.length === 2 && /^[A-Z][a-z]+$/.test(tokens[1])) {
-      // Skip bare "First Last" name pairs unless one token looks org-y; still extract
-      // multi-word names that include uppercase acronyms or 3+ tokens.
+  // Run per-sentence so a match can't span a sentence boundary (e.g. "...AI. Their...").
+  for (const sentence of text.split(/(?<=[.!?])\s+|\n+/)) {
+    let pm: RegExpExecArray | null;
+    properNounRe.lastIndex = 0;
+    while ((pm = properNounRe.exec(sentence)) !== null) {
+      const tokens = pm[0].trim().split(/\s+/);
+      // Strip leading/trailing stopword tokens: "Most Amazon" -> "Amazon".
+      while (tokens.length > 0 && STOPWORDS.has(tokens[0])) tokens.shift();
+      while (tokens.length > 0 && STOPWORDS.has(tokens[tokens.length - 1])) tokens.pop();
+      if (tokens.length < 2) continue; // single tokens are not multi-word org claims
+      // A bare 2-word Title-Case pair is only a company claim if it carries an
+      // org suffix; otherwise skip (avoids "Perfect English", "Online Safety").
+      if (tokens.length === 2 && !tokens.some((t) => ORG_SUFFIX.test(t))) continue;
+      const phrase = tokens.join(" ");
+      push(phrase, "company", sentence.trim().slice(0, 90));
     }
-    push(phrase, "company", grabContext(m.index, m[0].length));
   }
 
   return out;
@@ -254,11 +269,40 @@ function checkProseGrounding(content: string, corpus: string): AuditFailure[] {
   const corpusLower = corpus.toLowerCase();
   const corpusFlat = corpusLower.replace(/[^a-z0-9]+/g, "");
 
+  // A sentence is only subject to grounding-failure when it makes a *specific,
+  // checkable* assertion. Rhetorical hooks and opinion/framing ("Most security
+  // advice focuses on prevention", "Scammers test new tactics in new markets")
+  // carry no factual anchor and must pass freely. Specific fabricated facts
+  // ("a hospital was breached last week", "deepfake voices of grandchildren")
+  // always carry an anchor: a number, a time/recency word, a scam-event term,
+  // or a mid-sentence proper noun.
+  const TIME_ANCHORS = new Set([
+    "now","today","tonight","yesterday","tomorrow","week","weeks","month","months",
+    "hour","hours","minute","minutes","second","seconds","day","days","recently","currently","lately",
+  ]);
+  const EVENT_ANCHORS = [
+    "breach","breached","hack","hacked","leak","leaked","stolen","steal","deepfake","ransomware",
+    "phishing","malware","hijack","arrested","charged","fined","scammed","defrauded","wire transfer","data breach",
+  ];
+  const hasFactualAnchor = (sentence: string, keywords: string[]): boolean => {
+    if (/\d/.test(sentence)) return true;
+    const low = sentence.toLowerCase();
+    for (const e of EVENT_ANCHORS) if (low.includes(e)) return true;
+    for (const k of keywords) if (TIME_ANCHORS.has(k)) return true;
+    const words = sentence.trim().split(/\s+/);
+    for (let i = 1; i < words.length; i++) {
+      const w = words[i].replace(/[^A-Za-z]/g, "");
+      if (w.length > 2 && /^[A-Z][a-z]+/.test(w)) return true; // mid-sentence proper noun
+    }
+    return false;
+  };
+
   const seen = new Set<string>();
   for (const sentence of splitSentences(content)) {
     if (!isAssertiveProse(sentence)) continue;
-    const keywords = proseKeywords(sentence);
-    if (keywords.length < 5) continue;
+    const keywords = Array.from(new Set(proseKeywords(sentence)));
+    if (keywords.length < 6) continue;
+    if (!hasFactualAnchor(sentence, keywords)) continue;
 
     let supported = 0;
     for (const k of keywords) {
@@ -313,7 +357,12 @@ export function auditPostContent(content: string, bundle: SourceBundle): ClaimAu
 
   for (const claim of extracted) {
     if (STRICT_KINDS.includes(claim.kind)) {
-      if (isAllowedVerbatim(claim, allowedSet)) {
+      // A year that appears in the underlying source corpus is, by definition,
+      // supported (e.g. a guide titled "...Scams 2024"). This unblocks legitimate
+      // year stamps in titles without weakening fabrication detection: a year not
+      // present anywhere in the source still fails.
+      const yearInCorpus = claim.kind === "year" && corpusContains(corpus, claim.text);
+      if (isAllowedVerbatim(claim, allowedSet) || yearInCorpus) {
         matched.push(claim.text);
       } else {
         failures.push({

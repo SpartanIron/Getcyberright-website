@@ -394,6 +394,8 @@ export async function generateSocialPostsForArticle(
         hashtags: posts.hashtags,
         imageUrl: imageUrl || undefined,
         status: "draft",
+        // News editorial posts are short teasers + link: the "wire" depth model.
+        postStyle: "wire",
       };
 
       await storage.createSocialPost(socialPost);

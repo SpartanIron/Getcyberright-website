@@ -1,5 +1,6 @@
 import { storage } from "./storage";
 import { validatePostContent } from "./socialPostPolicy";
+import { stripCitationReceipt } from "./socialCitationReceipt";
 
 export interface QualityGateInput {
   platform: string;
@@ -44,6 +45,15 @@ export async function runSocialQualityGate(post: QualityGateInput): Promise<stri
     }
   } catch (err: any) {
     console.warn(`[QualityGate] source lookup failed: ${err.message}`);
+  }
+
+  // Hard gate against empty posts: the citation receipt alone can push total
+  // length over minChars while the actual body is blank. Strip the receipt and
+  // require a real body for EVERY platform (alerts included).
+  const body = stripCitationReceipt(post.postContent || "").trim();
+  const minBody = post.platform === "alert" ? 20 : 40;
+  if (body.length < minBody) {
+    return `Quality gate: post body is empty or too short (${body.length} chars excluding the citation receipt, need at least ${minBody}). Refusing to publish a blank post.`;
   }
 
   const requireCanonical = post.platform !== "instagram" && !!canonicalUrl;
