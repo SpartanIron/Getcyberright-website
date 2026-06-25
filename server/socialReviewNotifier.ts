@@ -41,7 +41,7 @@ function base64UrlDecode(str: string): Buffer {
   return Buffer.from(str.replace(/-/g, "+").replace(/_/g, "/") + pad, "base64");
 }
 
-export type ReviewAction = "approve" | "reject";
+export type ReviewAction = "approve" | "reject" | "retract";
 
 export function signReviewActionToken(postId: string, action: ReviewAction, ttlMs = TOKEN_TTL_MS): string {
   const exp = Date.now() + ttlMs;
@@ -113,7 +113,7 @@ export function verifyReviewActionTokenDetailed(rawToken: string): VerifyReviewA
   if (typeof payload?.postId !== "string") {
     return { verified: null, reason: "bad_payload" };
   }
-  if (payload.action !== "approve" && payload.action !== "reject") {
+  if (payload.action !== "approve" && payload.action !== "reject" && payload.action !== "retract") {
     return { verified: null, reason: "bad_action" };
   }
   if (typeof payload.exp !== "number" || payload.exp < Date.now()) {
@@ -358,6 +358,49 @@ function buildDigestEmail(posts: SocialPost[]): { subject: string; htmlBody: str
   return { subject, htmlBody, textBody };
 }
 
+function buildPublishedEmail(post: SocialPost): { subject: string; htmlBody: string; textBody: string } {
+  const baseUrl = getPublicBaseUrl();
+  const retractUrl = `${baseUrl}/api/social-posts/review-action?token=${signReviewActionToken(post.id, "retract")}`;
+  const platform = escapeHtml(post.platform);
+  const subject = `[GCR] Published to ${post.platform}: ${post.contentTitle}`;
+  const htmlBody = `
+    <!DOCTYPE html>
+    <html><head><meta charset="utf-8"></head>
+    <body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:#f1f5f9; margin:0; padding:24px;">
+      <div style="max-width:640px; margin:0 auto;">
+        <h1 style="color:#0f172a; font-size:22px; margin:0 0 6px;">We just published a reactive post</h1>
+        <p style="color:#475569; margin:0 0 18px; font-size:14px;">This went out to <strong>${platform}</strong> automatically after passing the fact-check and quality gate. No action is needed. If it shouldn't have gone out, you can pull it down below.</p>
+        <div style="border:1px solid #e2e8f0; border-radius:10px; padding:18px; margin-bottom:16px; background:#ffffff;">
+          <div style="font-size:12px; color:#64748b; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:6px;">${platform} · ${escapeHtml(post.contentType)}</div>
+          <h3 style="margin:0 0 10px; color:#0f172a; font-size:17px;">${escapeHtml(post.contentTitle)}</h3>
+          <pre style="white-space:pre-wrap; font-family:inherit; background:#f8fafc; border-radius:6px; padding:12px; color:#0f172a; font-size:14px; line-height:1.55; margin:10px 0;">${escapeHtml(post.postContent)}</pre>
+          <div style="margin-top:14px;">
+            <a href="${retractUrl}" style="display:inline-block; background:#dc2626; color:#ffffff; text-decoration:none; padding:10px 18px; border-radius:6px; font-weight:600; font-size:14px;">Pull it down</a>
+          </div>
+        </div>
+        <p style="color:#94a3b8; font-size:12px; margin-top:18px;">Pulling it down removes it from Buffer. If the post already went live on the network, you may also need to delete it there. This link works for 7 days.</p>
+      </div>
+    </body></html>
+  `;
+  const textBody = `We just published a reactive post to ${post.platform} (it passed the fact-check and quality gate). No action needed.\n\n[${post.platform} · ${post.contentType}] ${post.contentTitle}\n${post.postContent}\n\nPull it down: ${retractUrl}\n\n(Pulling it down removes it from Buffer; if it already went live on the network you may also need to delete it there.)`;
+  return { subject, htmlBody, textBody };
+}
+
+// Sends a "we published this, here's how to pull it down" notice for an
+// auto-published reactive post. Replaces the old "needs your approval" email for
+// posts that cleared the automatic checks.
+export async function notifyReactivePublished(post: SocialPost): Promise<void> {
+  if (!isEmailConfigured()) return;
+  const recipients = await getAdminRecipients();
+  if (recipients.length === 0) return;
+  const { subject, htmlBody, textBody } = buildPublishedEmail(post);
+  const emails = recipients.map((r) => r.email);
+  const ok = await sendEmail({ to: emails, subject, htmlBody, textBody });
+  if (!ok) {
+    log.error("Email provider rejected published notice", { postId: post.id, recipients: emails.length });
+  }
+}
+
 async function markPostsNotified(ids: string[], at: Date): Promise<boolean> {
   if (ids.length === 0) return true;
   try {
@@ -503,6 +546,40 @@ export async function executeReviewAction(postId: string, action: ReviewAction):
       publishError: "Rejected via signed email link",
     });
     return { ok: true, status: 200, message: "Post rejected" };
+  }
+
+  if (action === "retract") {
+    if (post.status !== "published") {
+      return { ok: false, status: 400, message: `Post is ${post.status}, there is nothing live to pull down` };
+    }
+    let deleteOk = false;
+    let deleteNote = "No Buffer reference was stored for this post";
+    if (post.bufferPostId) {
+      const { deleteBufferPost } = await import("./bufferPublisher");
+      const del = await deleteBufferPost(post.bufferPostId);
+      deleteOk = del.success;
+      deleteNote = del.success ? "" : del.error || "Buffer could not remove it";
+    }
+    await storage.updateSocialPost(postId, {
+      status: "retracted",
+      auditVerdict: "retracted_by_admin",
+      publishError: "Pulled down via signed email link",
+    });
+    log.info("Reactive post retracted", { postId, platform: post.platform, deleteOk });
+    if (deleteOk) {
+      return {
+        ok: true,
+        status: 200,
+        message: "Post pulled down from Buffer.",
+        detail: `If it had already gone live on ${post.platform}, remove it directly on the network too.`,
+      };
+    }
+    return {
+      ok: true,
+      status: 200,
+      message: "Marked as pulled down.",
+      detail: `Buffer could not remove it automatically (${deleteNote}). If it already went live on ${post.platform}, remove it directly on the network.`,
+    };
   }
 
   if (post.status !== "review_pending") {

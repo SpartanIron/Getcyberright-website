@@ -1448,6 +1448,7 @@ export const socialPosts = pgTable("social_posts", {
   auditVerdict: text("audit_verdict"),
   auditFailures: jsonb("audit_failures").$type<{ claim: string; kind: string; reason: string }[]>().default([]),
   imageSource: text("image_source"),
+  bufferPostId: text("buffer_post_id"),
   reviewExpiresAt: timestamp("review_expires_at"),
   notifiedAt: timestamp("notified_at"),
   createdAt: timestamp("created_at").defaultNow(),

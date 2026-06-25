@@ -1316,15 +1316,15 @@ export function registerPlatformRoutes(app: Express): void {
     }
   });
 
-  // ─── Signed one-click approve/reject from admin notification email ──────
-  // Token is HMAC-signed with SESSION_SECRET, scoped to a single post + action,
-  // and expires after 24h. The endpoint is intentionally unauthenticated because
-  // possession of a valid token from the admin inbox is the auth factor.
-  app.get("/api/social-posts/review-action", async (req: Request, res: Response) => {
-    const token = (req.query.token as string | undefined) || "";
-    const renderPage = (title: string, message: string, statusOk: boolean, detail?: string) => {
-      const accent = statusOk ? "#0d9488" : "#dc2626";
-      return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${escapeHtml(title)}</title></head>
+  // ─── Signed approve/reject/retract from admin notification email ──────
+  // Token is HMAC-signed with REVIEW_ACTION_SECRET (falling back to
+  // SESSION_SECRET), scoped to a single post + action, and expires after 7 days.
+  // The endpoint is intentionally unauthenticated because possession of a valid
+  // token from the admin inbox is the auth factor. GET only renders a confirm
+  // page; the action runs on POST so email link prefetchers cannot trigger it.
+  const renderReviewActionPage = (title: string, message: string, statusOk: boolean, detail?: string) => {
+    const accent = statusOk ? "#0d9488" : "#dc2626";
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="robots" content="noindex"><title>${escapeHtml(title)}</title></head>
 <body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:#f1f5f9; padding:48px 16px;">
   <div style="max-width:520px; margin:0 auto; background:#fff; border-radius:12px; padding:32px; box-shadow:0 4px 12px rgba(15,23,42,0.08);">
     <div style="height:6px; width:60px; background:${accent}; border-radius:999px; margin-bottom:18px;"></div>
@@ -1333,10 +1333,57 @@ export function registerPlatformRoutes(app: Express): void {
     ${detail ? `<p style="margin:8px 0 0; color:#64748b; font-size:13px;">${escapeHtml(detail)}</p>` : ""}
   </div>
 </body></html>`;
-    };
+  };
 
+  const REVIEW_ACTION_LABELS: Record<string, { title: string; button: string; lead: string; danger: boolean }> = {
+    approve: { title: "Publish this post?", button: "Publish now", lead: "This will run the claim audit + quality gate and publish the post live.", danger: false },
+    reject: { title: "Reject this post?", button: "Reject post", lead: "This will discard the post so it is never published.", danger: true },
+    retract: { title: "Pull this post down?", button: "Pull it down", lead: "This will remove the post from the publishing queue (best effort) and mark it as pulled down.", danger: true },
+  };
+
+  // GET renders a confirmation page only. It performs NO state change, so email
+  // link scanners / prefetchers (which only issue GET) can never approve, reject
+  // or retract a post by accident. The actual action runs on the POST below,
+  // triggered by a human clicking the button.
+  app.get("/api/social-posts/review-action", async (req: Request, res: Response) => {
+    const token = (req.query.token as string | undefined) || "";
     if (!token) {
-      return res.status(400).type("html").send(renderPage("Invalid link", "Missing action token.", false));
+      return res.status(400).type("html").send(renderReviewActionPage("Invalid link", "Missing action token.", false));
+    }
+
+    const { verifyReviewActionTokenDetailed } = await import("./socialReviewNotifier");
+    const { verified, reason } = verifyReviewActionTokenDetailed(token);
+    if (!verified) {
+      const isExpired = reason === "expired";
+      const title = isExpired ? "Link expired" : "Invalid or expired link";
+      const message = isExpired
+        ? "This review link has expired. Open the admin review queue to approve or reject the post directly."
+        : "This review link could not be verified. It may have been rewritten by your email provider, or the signing secret was rotated since the email was sent. Open the admin review queue to take action.";
+      const detail = `Reason: ${reason || "unknown"}. Sign in and visit /admin/editorial-review to approve or reject the post.`;
+      return res.status(400).type("html").send(renderReviewActionPage(title, message, false, detail));
+    }
+
+    const label = REVIEW_ACTION_LABELS[verified.action] || REVIEW_ACTION_LABELS.approve;
+    const accent = label.danger ? "#dc2626" : "#0d9488";
+    const postUrl = `/api/social-posts/review-action?token=${encodeURIComponent(token)}`;
+    const page = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="robots" content="noindex"><title>${escapeHtml(label.title)}</title></head>
+<body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:#f1f5f9; padding:48px 16px;">
+  <div style="max-width:520px; margin:0 auto; background:#fff; border-radius:12px; padding:32px; box-shadow:0 4px 12px rgba(15,23,42,0.08);">
+    <div style="height:6px; width:60px; background:${accent}; border-radius:999px; margin-bottom:18px;"></div>
+    <h1 style="margin:0 0 12px; color:#0f172a; font-size:22px;">${escapeHtml(label.title)}</h1>
+    <p style="margin:0 0 20px; color:#334155; font-size:15px;">${escapeHtml(label.lead)}</p>
+    <form method="POST" action="${postUrl}">
+      <button type="submit" style="display:inline-block; background:${accent}; color:#fff; border:none; border-radius:999px; padding:12px 28px; font-size:15px; font-weight:600; cursor:pointer;">${escapeHtml(label.button)}</button>
+    </form>
+  </div>
+</body></html>`;
+    return res.status(200).type("html").send(page);
+  });
+
+  app.post("/api/social-posts/review-action", async (req: Request, res: Response) => {
+    const token = (req.query.token as string | undefined) || (req.body && req.body.token) || "";
+    if (!token) {
+      return res.status(400).type("html").send(renderReviewActionPage("Invalid link", "Missing action token.", false));
     }
 
     const { verifyReviewActionTokenDetailed, executeReviewAction } = await import("./socialReviewNotifier");
@@ -1348,22 +1395,21 @@ export function registerPlatformRoutes(app: Express): void {
         ? "This review link has expired. Open the admin review queue to approve or reject the post directly."
         : "This review link could not be verified. It may have been rewritten by your email provider, or the signing secret was rotated since the email was sent. Open the admin review queue to take action.";
       const detail = `Reason: ${reason || "unknown"}. Sign in and visit /admin/editorial-review to approve or reject the post.`;
-      return res
-        .status(400)
-        .type("html")
-        .send(renderPage(title, message, false, detail));
+      return res.status(400).type("html").send(renderReviewActionPage(title, message, false, detail));
     }
 
     const result = await executeReviewAction(verified.postId, verified.action);
     const title = result.ok
       ? verified.action === "approve"
         ? "Post approved"
-        : "Post rejected"
+        : verified.action === "retract"
+          ? "Post pulled down"
+          : "Post rejected"
       : "Action could not be completed";
     return res
       .status(result.status)
       .type("html")
-      .send(renderPage(title, result.message, result.ok, result.detail));
+      .send(renderReviewActionPage(title, result.message, result.ok, result.detail));
   });
 
   app.get("/api/admin/social-posts/audit-log", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {

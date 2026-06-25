@@ -370,7 +370,7 @@ export async function publishPostViaBuffer(postId: string): Promise<BufferPublis
   }
 
   if (result.success) {
-    await storage.updateSocialPost(postId, { status: "published", publishedAt: new Date() });
+    await storage.updateSocialPost(postId, { status: "published", publishedAt: new Date(), bufferPostId: result.bufferId || null });
     console.log(`[Buffer] Published ${post.platform}: "${post.contentTitle}" (${result.bufferId})`);
   } else if (result.limitReached) {
     console.warn(`[Buffer] Limit reached, keeping ${post.platform} post as draft`);
@@ -552,6 +552,31 @@ export async function createBufferPost(
   } = {}
 ): Promise<BufferPublishResult> {
   return sendToBuffer(channelId, text, options.platform || "", options.imageUrl);
+}
+
+// Best-effort take-down of a post we previously sent to Buffer. Buffer can delete
+// a queued/scheduled post outright, but a post that already went live on the
+// network may no longer be removable here — the caller surfaces that honestly.
+export async function deleteBufferPost(bufferPostId: string): Promise<{ success: boolean; error?: string }> {
+  if (!isBufferConfigured()) return { success: false, error: "Buffer is not configured" };
+  if (!bufferPostId) return { success: false, error: "No Buffer post id" };
+  try {
+    const data = await graphql<{ deletePost: { __typename: string; id?: string; message?: string } }>(
+      `mutation DeletePost($input: DeletePostInput!) {
+        deletePost(input: $input) {
+          __typename
+          ... on DeletePostSuccess { id }
+          ... on VoidMutationError { message }
+        }
+      }`,
+      { input: { id: bufferPostId } },
+    );
+    const r = data?.deletePost;
+    if (r?.__typename === "DeletePostSuccess" || r?.id) return { success: true };
+    return { success: false, error: r?.message || "Buffer declined to delete the post" };
+  } catch (error: any) {
+    return { success: false, error: error?.message || "Buffer delete request failed" };
+  }
 }
 
 export async function getBufferStatus(): Promise<{

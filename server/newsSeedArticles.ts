@@ -127,6 +127,7 @@ export async function seedNewsArticles(): Promise<number> {
         "audit_verdict" text,
         "audit_failures" jsonb,
         "image_source" text,
+        "buffer_post_id" text,
         "review_expires_at" timestamp,
         "notified_at" timestamp,
         "created_at" timestamp DEFAULT now()
