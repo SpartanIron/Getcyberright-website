@@ -4754,7 +4754,7 @@ BEHAVIORAL CONSTRAINTS
 
       const parsed = schema.safeParse(req.body);
       if (!parsed.success) {
-        return res.status(400).json({ error: parsed.error.errors[0]?.message || "Invalid input" });
+        return res.status(400).json({ error: parsed.error.issues[0]?.message || "Invalid input" });
       }
 
       const feedback = await storage.createFeedback({
@@ -4811,7 +4811,7 @@ BEHAVIORAL CONSTRAINTS
 
       const parsed = schema.safeParse(req.body);
       if (!parsed.success) {
-        return res.status(400).json({ error: parsed.error.errors[0]?.message || "Invalid input" });
+        return res.status(400).json({ error: parsed.error.issues[0]?.message || "Invalid input" });
       }
 
       const { email, name, score, level } = parsed.data;

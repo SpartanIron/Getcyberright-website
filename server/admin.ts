@@ -176,7 +176,7 @@ export function registerAdminRoutes(app: Express) {
     try {
       const validationResult = createUserSchema.safeParse(req.body);
       if (!validationResult.success) {
-        return res.status(400).json({ error: "Invalid data", details: validationResult.error.errors });
+        return res.status(400).json({ error: "Invalid data", details: validationResult.error.issues });
       }
 
       const { email, password, firstName, lastName, role, subscriptionTier, mustChangePassword } = validationResult.data;
@@ -223,7 +223,7 @@ export function registerAdminRoutes(app: Express) {
       
       const validationResult = updateUserSchema.safeParse(req.body);
       if (!validationResult.success) {
-        return res.status(400).json({ error: "Invalid data", details: validationResult.error.errors });
+        return res.status(400).json({ error: "Invalid data", details: validationResult.error.issues });
       }
       
       const { isAdmin: makeAdmin, subscriptionTier, emailVerified, role } = validationResult.data;
@@ -1032,7 +1032,7 @@ export function registerAdminRoutes(app: Express) {
     try {
       const parsed = adminNotificationSettingsSchema.safeParse(req.body);
       if (!parsed.success) {
-        return res.status(400).json({ error: "Invalid data", details: parsed.error.errors });
+        return res.status(400).json({ error: "Invalid data", details: parsed.error.issues });
       }
       const slackWebhookUrl = (parsed.data.slackWebhookUrl || "").trim() || null;
       const webhookUrl = (parsed.data.webhookUrl || "").trim() || null;

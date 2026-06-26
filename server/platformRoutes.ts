@@ -948,7 +948,7 @@ export function registerPlatformRoutes(app: Express): void {
       if (!guide) return res.status(404).json({ error: "Guide not found" });
       res.json(guide);
     } catch (error: any) {
-      if (error instanceof z.ZodError) return res.status(400).json({ error: "Validation failed", details: error.errors });
+      if (error instanceof z.ZodError) return res.status(400).json({ error: "Validation failed", details: error.issues });
       res.status(400).json({ error: error.message || "Failed to update guide" });
     }
   });
@@ -1019,7 +1019,7 @@ export function registerPlatformRoutes(app: Express): void {
       if (!scam) return res.status(404).json({ error: "Scam intel not found" });
       res.json(scam);
     } catch (error: any) {
-      if (error instanceof z.ZodError) return res.status(400).json({ error: "Validation failed", details: error.errors });
+      if (error instanceof z.ZodError) return res.status(400).json({ error: "Validation failed", details: error.issues });
       res.status(400).json({ error: error.message || "Failed to update scam intel" });
     }
   });
@@ -1089,7 +1089,7 @@ export function registerPlatformRoutes(app: Express): void {
       if (!alert) return res.status(404).json({ error: "Alert not found" });
       res.json(alert);
     } catch (error: any) {
-      if (error instanceof z.ZodError) return res.status(400).json({ error: "Validation failed", details: error.errors });
+      if (error instanceof z.ZodError) return res.status(400).json({ error: "Validation failed", details: error.issues });
       res.status(400).json({ error: error.message || "Failed to update alert" });
     }
   });
@@ -1161,7 +1161,7 @@ export function registerPlatformRoutes(app: Express): void {
       if (!post) return res.status(404).json({ error: "Social post not found" });
       res.json(post);
     } catch (error: any) {
-      if (error instanceof z.ZodError) return res.status(400).json({ error: "Validation failed", details: error.errors });
+      if (error instanceof z.ZodError) return res.status(400).json({ error: "Validation failed", details: error.issues });
       res.status(400).json({ error: error.message || "Failed to update social post" });
     }
   });
@@ -1481,7 +1481,7 @@ export function registerPlatformRoutes(app: Express): void {
       if (!parsed.success) {
         return res.status(400).json({
           error: "Invalid 'as' value. Must be exactly 'false_positive' or 'true_positive'.",
-          details: parsed.error.errors,
+          details: parsed.error.issues,
         });
       }
       const { acknowledgeSuspect, getProseGateStats, getProseGateSuspects } = await import("./proseGateMonitor");
@@ -1762,7 +1762,7 @@ export function registerPlatformRoutes(app: Express): void {
       const taskId = await scheduleTask(taskType, taskName, payload, undefined, priority);
       res.json({ taskId });
     } catch (error: any) {
-      if (error instanceof z.ZodError) return res.status(400).json({ error: "Validation failed", details: error.errors });
+      if (error instanceof z.ZodError) return res.status(400).json({ error: "Validation failed", details: error.issues });
       res.status(500).json({ error: error.message || "Failed to schedule task" });
     }
   });

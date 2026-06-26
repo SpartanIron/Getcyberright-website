@@ -185,7 +185,7 @@ export function registerAuthRoutes(app: Express) {
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ error: "Validation failed", details: error.errors });
+        return res.status(400).json({ error: "Validation failed", details: error.issues });
       }
       console.error("Registration error:", error);
       res.status(500).json({ error: "Registration failed" });
@@ -336,7 +336,7 @@ export function registerAuthRoutes(app: Express) {
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ error: "Validation failed", details: error.errors });
+        return res.status(400).json({ error: "Validation failed", details: error.issues });
       }
       console.error("Login error:", error);
       res.status(500).json({ error: "Login failed" });
@@ -477,7 +477,7 @@ export function registerAuthRoutes(app: Express) {
       });
       const parsed = schema.safeParse(req.body);
       if (!parsed.success) {
-        return res.status(400).json({ error: "Invalid data", details: parsed.error.errors });
+        return res.status(400).json({ error: "Invalid data", details: parsed.error.issues });
       }
       const updates: Partial<typeof users.$inferInsert> = { updatedAt: new Date() };
       if (typeof parsed.data.notifyReviewQueueEmail === "boolean") {
@@ -648,7 +648,7 @@ export function registerAuthRoutes(app: Express) {
       res.json({ success: true, message: "Password has been reset successfully" });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ error: "Validation failed", details: error.errors });
+        return res.status(400).json({ error: "Validation failed", details: error.issues });
       }
       console.error("Reset password error:", error);
       res.status(500).json({ error: "Password reset failed" });
@@ -680,7 +680,7 @@ export function registerAuthRoutes(app: Express) {
       res.json({ success: true, message: "Password changed successfully" });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ error: "Validation failed", details: error.errors });
+        return res.status(400).json({ error: "Validation failed", details: error.issues });
       }
       console.error("Change password error:", error);
       res.status(500).json({ error: "Password change failed" });

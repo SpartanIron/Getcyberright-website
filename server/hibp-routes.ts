@@ -31,7 +31,7 @@ export function registerHIBPRoutes(app: Express): void {
         try {
                 const parsed = emailSchema.safeParse(req.body);
                 if (!parsed.success) {
-                          return res.status(400).json({ error: "Invalid email address", details: parsed.error.errors });
+                          return res.status(400).json({ error: "Invalid email address", details: parsed.error.issues });
                 }
                 const result = await checkEmailBreaches(parsed.data.email);
                 return res.json(result);
@@ -46,7 +46,7 @@ export function registerHIBPRoutes(app: Express): void {
         try {
                 const parsed = passwordSchema.safeParse(req.body);
                 if (!parsed.success) {
-                          return res.status(400).json({ error: "Invalid request", details: parsed.error.errors });
+                          return res.status(400).json({ error: "Invalid request", details: parsed.error.issues });
                 }
                 const result = await checkPasswordHealth(parsed.data.password);
                 return res.json(result);
