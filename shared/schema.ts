@@ -1800,6 +1800,25 @@ export const insertSupportReplySchema = createInsertSchema(supportReplies).omit(
 export type SupportReply = typeof supportReplies.$inferSelect;
 export type InsertSupportReply = z.infer<typeof insertSupportReplySchema>;
 
+// Saved/canned replies admins can insert when responding in the unified inbox
+export const savedReplies = pgTable("saved_replies", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  body: text("body").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertSavedReplySchema = createInsertSchema(savedReplies).omit({
+  id: true,
+  createdAt: true,
+}).extend({
+  title: z.string().trim().min(1).max(120),
+  body: z.string().trim().min(1).max(5000),
+});
+
+export type SavedReply = typeof savedReplies.$inferSelect;
+export type InsertSavedReply = z.infer<typeof insertSavedReplySchema>;
+
 export const maskedIdentities = pgTable("masked_identities", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull(),

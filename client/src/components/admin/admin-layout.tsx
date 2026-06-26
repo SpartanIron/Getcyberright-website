@@ -19,7 +19,8 @@ import {
   ScanSearch,
   Search,
   Bell,
-  PenLine
+  PenLine,
+  Inbox
 } from "lucide-react";
 import logoImage from "@/assets/logo.webp";
 import { imgSrc } from "@/lib/img-src";
@@ -30,6 +31,7 @@ interface AdminLayoutProps {
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/inbox", label: "Inbox", icon: Inbox },
   { href: "/admin/content", label: "Content Manager", icon: FileText },
   { href: "/admin/editorial-review", label: "Editorial Review", icon: PenLine },
   { href: "/admin/users", label: "Users", icon: Users },

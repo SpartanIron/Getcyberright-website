@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { db } from "./db";
 import { storage } from "./storage";
-import { users, contactMessages, newsletterSubscribers, scamReports, toolUsage, insertToolUsageSchema, platformAnnouncements, insertAnnouncementSchema, trendingThreats, insertTrendingThreatSchema, userFeedback, cyberSafetyGuides, cyberThreatAlerts, scamIntelligence, socialPosts, growthTasks, shieldScans, exposureScans, exposureFindings, adminNotificationSettings, adminNotificationSettingsSchema, supportReplies } from "@shared/schema";
+import { users, contactMessages, newsletterSubscribers, scamReports, toolUsage, insertToolUsageSchema, platformAnnouncements, insertAnnouncementSchema, trendingThreats, insertTrendingThreatSchema, userFeedback, cyberSafetyGuides, cyberThreatAlerts, scamIntelligence, socialPosts, growthTasks, shieldScans, exposureScans, exposureFindings, adminNotificationSettings, adminNotificationSettingsSchema, supportReplies, articleComments, newsArticles, savedReplies, insertSavedReplySchema } from "@shared/schema";
 import { sendEmail, isEmailConfigured } from "./email-service";
 import { isAuthenticated } from "./auth";
 import { eq, desc, count, sql, and, lte, or, isNull, gte } from "drizzle-orm";
@@ -493,6 +493,274 @@ export function registerAdminRoutes(app: Express) {
     } catch (error) {
       console.error("Admin contact replies error:", error);
       res.status(500).json({ error: "Failed to load replies" });
+    }
+  });
+
+  // ==========================================
+  // Unified inbox: aggregates contact messages, user feedback, scam reports,
+  // and article comments into one normalized, sortable list with answered flags.
+  // ==========================================
+  app.get("/api/admin/inbox", isAuthenticated, isAdminMiddleware, async (req, res) => {
+    try {
+      const typeFilter = req.query.type as string | undefined;
+      const filter = req.query.filter as string | undefined;
+
+      const [contacts, feedbacks, scams, comments, replies] = await Promise.all([
+        db.select().from(contactMessages).orderBy(desc(contactMessages.createdAt)),
+        db.select().from(userFeedback).orderBy(desc(userFeedback.createdAt)),
+        db.select().from(scamReports).orderBy(desc(scamReports.createdAt)),
+        db
+          .select({
+            id: articleComments.id,
+            authorName: articleComments.authorName,
+            authorEmail: articleComments.authorEmail,
+            content: articleComments.content,
+            parentId: articleComments.parentId,
+            isTeamReply: articleComments.isTeamReply,
+            createdAt: articleComments.createdAt,
+            articleTitle: newsArticles.title,
+            articleSlug: newsArticles.slug,
+          })
+          .from(articleComments)
+          .leftJoin(newsArticles, eq(articleComments.articleId, newsArticles.id))
+          .orderBy(desc(articleComments.createdAt)),
+        db.select().from(supportReplies),
+      ]);
+
+      const replied = new Set<string>();
+      const replyCount = new Map<string, number>();
+      for (const r of replies) {
+        const key = `${r.targetType}:${r.targetId}`;
+        replied.add(key);
+        replyCount.set(key, (replyCount.get(key) || 0) + 1);
+      }
+
+      // Top-level comments that already have a team reply attached
+      const teamRepliedParents = new Set<string>();
+      for (const c of comments) {
+        if (c.isTeamReply && c.parentId) teamRepliedParents.add(c.parentId);
+      }
+
+      type InboxItem = {
+        id: string;
+        type: "contact" | "feedback" | "scam" | "comment";
+        name: string;
+        email: string | null;
+        category: string | null;
+        title: string;
+        preview: string;
+        createdAt: Date | null;
+        answered: boolean;
+        replyCount: number;
+        canReply: boolean;
+        status: string | null;
+        unanswered: boolean;
+        meta: Record<string, any>;
+      };
+
+      const items: InboxItem[] = [];
+
+      for (const m of contacts) {
+        const key = `contact:${m.id}`;
+        items.push({
+          id: m.id, type: "contact", name: m.name, email: m.email,
+          category: m.category, title: `Contact: ${m.category}`, preview: m.message,
+          createdAt: m.createdAt, answered: replied.has(key), replyCount: replyCount.get(key) || 0,
+          canReply: !!m.email, status: null, unanswered: false, meta: {},
+        });
+      }
+
+      for (const f of feedbacks) {
+        const key = `feedback:${f.id}`;
+        items.push({
+          id: f.id, type: "feedback", name: f.email || "Anonymous", email: f.email,
+          category: f.category, title: `Feedback: ${f.category}`, preview: f.message,
+          createdAt: f.createdAt, answered: replied.has(key), replyCount: replyCount.get(key) || 0,
+          canReply: !!f.email, status: f.status, unanswered: false, meta: { page: f.page },
+        });
+      }
+
+      for (const s of scams) {
+        const key = `scam:${s.id}`;
+        const anon = s.anonymous === "true";
+        items.push({
+          id: s.id, type: "scam",
+          name: anon || !s.reporterEmail ? "Anonymous reporter" : s.reporterEmail,
+          email: s.reporterEmail, category: s.scamType, title: `Scam report: ${s.scamType}`,
+          preview: s.description, createdAt: s.createdAt, answered: replied.has(key),
+          replyCount: replyCount.get(key) || 0, canReply: !!s.reporterEmail, status: null,
+          unanswered: false,
+          meta: { scammerContact: s.scammerContact, amountLost: s.amountLost, anonymous: anon },
+        });
+      }
+
+      // Only top-level user comments are inbox items (team replies and nested replies are excluded)
+      for (const c of comments) {
+        if (c.isTeamReply || c.parentId) continue;
+        items.push({
+          id: c.id, type: "comment", name: c.authorName, email: c.authorEmail,
+          category: null, title: c.articleTitle ? `Comment on: ${c.articleTitle}` : "Article comment",
+          preview: c.content, createdAt: c.createdAt, answered: teamRepliedParents.has(c.id),
+          replyCount: teamRepliedParents.has(c.id) ? 1 : 0, canReply: !!c.articleSlug, status: null,
+          unanswered: false, meta: { articleSlug: c.articleSlug, articleTitle: c.articleTitle },
+        });
+      }
+
+      for (const it of items) {
+        it.unanswered =
+          it.canReply && !it.answered &&
+          (it.type !== "feedback" || (it.status !== "resolved" && it.status !== "dismissed"));
+      }
+
+      let result = items;
+      if (typeFilter && ["contact", "feedback", "scam", "comment"].includes(typeFilter)) {
+        result = result.filter((i) => i.type === typeFilter);
+      }
+      if (filter === "unanswered") {
+        result = result.filter((i) => i.unanswered);
+      }
+      result.sort(
+        (a, b) => (b.createdAt ? new Date(b.createdAt).getTime() : 0) - (a.createdAt ? new Date(a.createdAt).getTime() : 0),
+      );
+
+      const counts = {
+        total: items.length,
+        unanswered: items.filter((i) => i.unanswered).length,
+        contact: items.filter((i) => i.type === "contact").length,
+        feedback: items.filter((i) => i.type === "feedback").length,
+        scam: items.filter((i) => i.type === "scam").length,
+        comment: items.filter((i) => i.type === "comment").length,
+      };
+
+      res.json({ items: result, counts });
+    } catch (error) {
+      console.error("Admin inbox error:", error);
+      res.status(500).json({ error: "Failed to load inbox" });
+    }
+  });
+
+  // Email reply to a scam report (only when the reporter left an email)
+  app.post("/api/admin/scam-reports/:id/reply", isAuthenticated, isAdminMiddleware, async (req: any, res) => {
+    try {
+      const parsed = replyBodySchema.safeParse(req.body);
+      if (!parsed.success) return res.status(400).json({ error: "Subject and message are required" });
+
+      const [item] = await db.select().from(scamReports).where(eq(scamReports.id, req.params.id));
+      if (!item) return res.status(404).json({ error: "Scam report not found" });
+      if (!item.reporterEmail) return res.status(400).json({ error: "This report has no email address to reply to" });
+      if (!isEmailConfigured()) return res.status(503).json({ error: "Email sending is not configured on this server" });
+
+      const { adminId, adminName } = await resolveAdminName(req);
+      const delivered = await sendEmail({
+        to: [item.reporterEmail],
+        subject: parsed.data.subject,
+        htmlBody: buildReplyHtml(parsed.data.body),
+        textBody: parsed.data.body,
+      });
+      if (!delivered) return res.status(502).json({ error: "Email provider failed to send the reply" });
+
+      const [reply] = await db.insert(supportReplies).values({
+        targetType: "scam",
+        targetId: item.id,
+        toEmail: item.reporterEmail,
+        subject: parsed.data.subject,
+        body: parsed.data.body,
+        adminId,
+        adminName,
+        delivered,
+      }).returning();
+      res.status(201).json({ reply });
+    } catch (error) {
+      console.error("Admin scam reply error:", error);
+      res.status(500).json({ error: "Failed to send reply" });
+    }
+  });
+
+  app.get("/api/admin/scam-reports/:id/replies", isAuthenticated, isAdminMiddleware, async (req, res) => {
+    try {
+      const replies = await db.select().from(supportReplies)
+        .where(and(eq(supportReplies.targetType, "scam"), eq(supportReplies.targetId, req.params.id)))
+        .orderBy(desc(supportReplies.createdAt));
+      res.json({ replies });
+    } catch (error) {
+      console.error("Admin scam replies error:", error);
+      res.status(500).json({ error: "Failed to load replies" });
+    }
+  });
+
+  // Reply to an article comment in-thread (posts a public "GetCyberRight Team" reply)
+  app.post("/api/admin/comments/:id/reply", isAuthenticated, isAdminMiddleware, async (req: any, res) => {
+    try {
+      const content = String(req.body?.content || "").trim();
+      if (content.length < 2 || content.length > 2000) {
+        return res.status(400).json({ error: "Reply must be between 2 and 2000 characters" });
+      }
+      const adminId = req.session?.userId;
+      if (!adminId) return res.status(401).json({ error: "Not authenticated" });
+      const [parent] = await db.select().from(articleComments).where(eq(articleComments.id, req.params.id));
+      if (!parent) return res.status(404).json({ error: "Comment not found" });
+      const topParentId = parent.parentId || parent.id;
+      const [inserted] = await db.insert(articleComments).values({
+        articleId: parent.articleId,
+        userId: adminId,
+        authorName: "GetCyberRight Team",
+        authorEmail: null,
+        content,
+        parentId: topParentId,
+        isTeamReply: true,
+        status: "approved",
+      }).returning();
+      res.status(201).json({ comment: inserted });
+    } catch (error) {
+      console.error("Admin comment reply error:", error);
+      res.status(500).json({ error: "Failed to post reply" });
+    }
+  });
+
+  // Admin-scoped comment delete (respects the role-based admin model).
+  // Also removes any replies attached to the deleted comment to avoid orphans.
+  app.delete("/api/admin/comments/:id", isAuthenticated, isAdminMiddleware, async (req, res) => {
+    try {
+      await db.delete(articleComments).where(
+        or(eq(articleComments.id, req.params.id), eq(articleComments.parentId, req.params.id)),
+      );
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Admin comment delete error:", error);
+      res.status(500).json({ error: "Failed to delete comment" });
+    }
+  });
+
+  // Saved/canned replies
+  app.get("/api/admin/saved-replies", isAuthenticated, isAdminMiddleware, async (_req, res) => {
+    try {
+      const items = await db.select().from(savedReplies).orderBy(desc(savedReplies.createdAt));
+      res.json({ savedReplies: items });
+    } catch (error) {
+      console.error("Admin saved replies list error:", error);
+      res.status(500).json({ error: "Failed to load saved replies" });
+    }
+  });
+
+  app.post("/api/admin/saved-replies", isAuthenticated, isAdminMiddleware, async (req, res) => {
+    try {
+      const parsed = insertSavedReplySchema.safeParse(req.body);
+      if (!parsed.success) return res.status(400).json({ error: "Title and message are required" });
+      const [item] = await db.insert(savedReplies).values(parsed.data).returning();
+      res.status(201).json({ savedReply: item });
+    } catch (error) {
+      console.error("Admin saved reply create error:", error);
+      res.status(500).json({ error: "Failed to save reply" });
+    }
+  });
+
+  app.delete("/api/admin/saved-replies/:id", isAuthenticated, isAdminMiddleware, async (req, res) => {
+    try {
+      await db.delete(savedReplies).where(eq(savedReplies.id, req.params.id));
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Admin saved reply delete error:", error);
+      res.status(500).json({ error: "Failed to delete saved reply" });
     }
   });
 
