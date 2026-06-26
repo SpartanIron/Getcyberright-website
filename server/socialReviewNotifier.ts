@@ -532,7 +532,17 @@ export interface ReviewActionResult {
   detail?: string;
 }
 
-export async function executeReviewAction(postId: string, action: ReviewAction): Promise<ReviewActionResult> {
+export async function executeReviewAction(
+  postId: string,
+  action: ReviewAction,
+  options?: { override?: boolean },
+): Promise<ReviewActionResult> {
+  // override = a human reviewer explicitly clicked Approve (signed email link or
+  // admin portal). Their approval overrides the automatic claim re-audit so a
+  // post they vouched for always goes out. The automated sweeper never sets this,
+  // so unattended auto-publishing still requires a clean re-audit. The link
+  // validator + quality gate downstream still run, so nothing broken publishes.
+  const override = options?.override === true;
   const post = await storage.getSocialPostById(postId);
   if (!post) return { ok: false, status: 404, message: "Post not found" };
 
@@ -644,39 +654,61 @@ export async function executeReviewAction(postId: string, action: ReviewAction):
     }
 
     if (!bundle) {
-      await storage.updateSocialPost(postId, {
-        status: "blocked",
-        auditVerdict: "fail_on_approval",
-        publishError: "No auditable source bundle at approval time",
-      });
-      return { ok: false, status: 400, message: "Cannot approve: no auditable source bundle" };
-    }
-
-    const audit = auditPostContent(stripCitationReceipt(post.postContent), bundle);
-    if (audit.verdict !== "pass") {
-      const failureLines = audit.failures.map((f) => `${f.kind}: ${f.reason}`);
-      await storage.updateSocialPost(postId, {
-        status: "blocked",
-        auditVerdict: "fail_on_approval",
-        auditFailures: failureLines,
-        publishError: "Re-audit failed at approval time",
-      });
-      log.warn("Re-audit failed at approval time", {
+      if (!override) {
+        await storage.updateSocialPost(postId, {
+          status: "blocked",
+          auditVerdict: "fail_on_approval",
+          publishError: "No auditable source bundle at approval time",
+        });
+        return { ok: false, status: 400, message: "Cannot approve: no auditable source bundle" };
+      }
+      log.warn("Approving without an auditable source bundle (admin override, publishing anyway)", {
         postId,
         platform: post.platform,
         contentType: post.contentType,
-        failureCount: audit.failures.length,
-        firstFailures: failureLines.slice(0, 5),
       });
-      const detail = failureLines.length
-        ? `Blocking claim${failureLines.length === 1 ? "" : "s"}: ${failureLines.slice(0, 3).join(" | ")}${failureLines.length > 3 ? ` (+${failureLines.length - 3} more)` : ""}. Open /admin/editorial-review to review and override.`
-        : undefined;
-      return {
-        ok: false,
-        status: 400,
-        message: "Re-audit failed at approval time. Post blocked.",
-        detail,
-      };
+    } else {
+      const audit = auditPostContent(stripCitationReceipt(post.postContent), bundle);
+      if (audit.verdict !== "pass") {
+        const failureLines = audit.failures.map((f) => `${f.kind}: ${f.reason}`);
+        if (!override) {
+          await storage.updateSocialPost(postId, {
+            status: "blocked",
+            auditVerdict: "fail_on_approval",
+            auditFailures: failureLines,
+            publishError: "Re-audit failed at approval time",
+          });
+          log.warn("Re-audit failed at approval time", {
+            postId,
+            platform: post.platform,
+            contentType: post.contentType,
+            failureCount: audit.failures.length,
+            firstFailures: failureLines.slice(0, 5),
+          });
+          const detail = failureLines.length
+            ? `Blocking claim${failureLines.length === 1 ? "" : "s"}: ${failureLines.slice(0, 3).join(" | ")}${failureLines.length > 3 ? ` (+${failureLines.length - 3} more)` : ""}. Open /admin/editorial-review to review and override.`
+            : undefined;
+          return {
+            ok: false,
+            status: 400,
+            message: "Re-audit failed at approval time. Post blocked.",
+            detail,
+          };
+        }
+        // Admin override: the human reviewer explicitly approved this post, so we
+        // record the audit warnings for the trail but publish anyway.
+        log.warn("Re-audit failed at approval time (admin override, publishing anyway)", {
+          postId,
+          platform: post.platform,
+          contentType: post.contentType,
+          failureCount: audit.failures.length,
+          firstFailures: failureLines.slice(0, 5),
+        });
+        await storage.updateSocialPost(postId, {
+          auditVerdict: "approved_by_admin",
+          auditFailures: failureLines,
+        });
+      }
     }
     const gateError = await runSocialQualityGate({
       platform: post.platform,

@@ -1336,7 +1336,7 @@ export function registerPlatformRoutes(app: Express): void {
   };
 
   const REVIEW_ACTION_LABELS: Record<string, { title: string; button: string; lead: string; danger: boolean }> = {
-    approve: { title: "Publish this post?", button: "Publish now", lead: "This will run the claim audit + quality gate and publish the post live.", danger: false },
+    approve: { title: "Publish this post?", button: "Publish now", lead: "This will publish the post live right now. Your approval overrides the automatic fact-check.", danger: false },
     reject: { title: "Reject this post?", button: "Reject post", lead: "This will discard the post so it is never published.", danger: true },
     retract: { title: "Pull this post down?", button: "Pull it down", lead: "This will remove the post from the publishing queue (best effort) and mark it as pulled down.", danger: true },
   };
@@ -1398,7 +1398,7 @@ export function registerPlatformRoutes(app: Express): void {
       return res.status(400).type("html").send(renderReviewActionPage(title, message, false, detail));
     }
 
-    const result = await executeReviewAction(verified.postId, verified.action);
+    const result = await executeReviewAction(verified.postId, verified.action, { override: true });
     const title = result.ok
       ? verified.action === "approve"
         ? "Post approved"
