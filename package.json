@@ -8,7 +8,7 @@
     "build": "next build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
     "start": "NODE_ENV=production node dist/index.js",
     "migrate": "drizzle-kit migrate",
-        "db:migrate": "tsx scripts/apply-migrations.ts"
+    "db:migrate": "tsx scripts/apply-migrations.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.74.0",
@@ -99,7 +99,7 @@
     "memoizee": "^0.4.17",
     "multer": "^2.0.2",
     "nanoid": "^5.1.6",
-    "next": "^16.2.3",
+    "next": "^16.2.12",
     "openai": "^6.18.0",
     "openid-client": "^6.8.2",
     "otplib": "^13.2.1",
