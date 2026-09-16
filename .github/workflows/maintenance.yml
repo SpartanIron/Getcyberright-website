@@ -10,27 +10,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - name: Runtime config files
+      - name: A openai any reference
+        run: grep -rn -i "openai" --include=*.ts --include=*.tsx --include=*.mjs --include=*.js --exclude-dir=node_modules --exclude-dir=.next --exclude-dir=dist . | grep -v -i "AI_INTEGRATIONS_OPENAI\|openai.com" | head -40
+      - name: B neon / drizzle config / db driver
         run: |
-          ls -la
-          for f in Dockerfile railway.json railway.toml nixpacks.toml .nvmrc .node-version .replit replit.nix Procfile .github/dependabot.yml; do
-            [ -f "$f" ] && { echo "===== $f ====="; cat "$f"; }
-          done
-          node -e 'const p=require("./package.json");console.log("engines:",p.engines,"\nscripts:",p.scripts)'
-          ls tests | head -50
-      - name: object-storage / uuid
+          cat drizzle.config.ts
+          grep -rn -E "from ['\"](postgres|pg|drizzle-orm/[a-z-]+)['\"]|import\(['\"]@neondatabase" --include=*.ts --exclude-dir=node_modules . | head -20
+      - name: C archiver route
+        run: sed -n '5440,5520p' server/routes.ts
+      - name: D downloadSocialImage + bulk upload call sites
         run: |
-          echo "===== server/imageStorage.ts ====="; cat server/imageStorage.ts
-          grep -rn --include=*.ts --include=*.tsx --include=*.js --include=*.mjs -E "imageStorage|object-storage|REPLIT_|from ['\"]uuid['\"]" --exclude-dir=node_modules --exclude-dir=.next . | head -60
-      - name: neon usages
-        run: grep -rn --include=*.ts --include=*.tsx --include=*.mjs --include=*.js -E "@neondatabase/serverless|neon\(|neonConfig|new Pool|drizzle-orm/neon" --exclude-dir=node_modules --exclude-dir=.next . | head -60
-      - name: neon sql call sites (non-tagged)
-        run: grep -rn --include=*.ts -E "\bsql\(|\bneonSql\(|\.transaction\(" server shared scripts app 2>/dev/null | grep -v "drizzle" | head -60
-      - name: openai usages
-        run: grep -rn --include=*.ts --include=*.tsx -E "from ['\"]openai|require\(['\"]openai|new OpenAI|openai\.[a-zA-Z]+\.[a-zA-Z]+" --exclude-dir=node_modules --exclude-dir=.next . | head -60
-      - name: archiver usages
-        run: grep -rn --include=*.ts --include=*.tsx --include=*.mjs -E "archiver" --exclude-dir=node_modules --exclude-dir=.next . | head -40
-      - name: PR diffs of package.json for dependabot branches
+          sed -n '50,99p' server/imageStorage.ts
+          sed -n '210,245p' server/routes.ts
+          sed -n '315,335p' server/index.ts
+      - name: E tests and test runner
         run: |
-          git fetch origin '+refs/heads/dependabot/*:refs/remotes/origin/dependabot/*' --depth=1 || true
-          git branch -r | grep dependabot || true
+          head -30 tests/shield-security.test.ts
+          grep -rn "node:test\|vitest\|jest" tests | head
+      - name: F dependabot PR package.json diffs
+        run: |
+          git fetch --no-tags origin '+refs/heads/dependabot/*:refs/remotes/origin/dependabot/*'
+          for b in $(git branch -r | grep dependabot); do echo "===== $b ====="; git diff origin/main...$b -- package.json .github | head -30; done
