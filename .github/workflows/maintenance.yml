@@ -1,0 +1,36 @@
+# TEMPORARY helper workflow: remove before merging.
+name: Maintenance investigation (temporary)
+on:
+  push:
+    branches: [ "chore/deps-maintenance" ]
+permissions:
+  contents: read
+jobs:
+  investigate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Runtime config files
+        run: |
+          ls -la
+          for f in Dockerfile railway.json railway.toml nixpacks.toml .nvmrc .node-version .replit replit.nix Procfile .github/dependabot.yml; do
+            [ -f "$f" ] && { echo "===== $f ====="; cat "$f"; }
+          done
+          node -e 'const p=require("./package.json");console.log("engines:",p.engines,"\nscripts:",p.scripts)'
+          ls tests | head -50
+      - name: object-storage / uuid
+        run: |
+          echo "===== server/imageStorage.ts ====="; cat server/imageStorage.ts
+          grep -rn --include=*.ts --include=*.tsx --include=*.js --include=*.mjs -E "imageStorage|object-storage|REPLIT_|from ['\"]uuid['\"]" --exclude-dir=node_modules --exclude-dir=.next . | head -60
+      - name: neon usages
+        run: grep -rn --include=*.ts --include=*.tsx --include=*.mjs --include=*.js -E "@neondatabase/serverless|neon\(|neonConfig|new Pool|drizzle-orm/neon" --exclude-dir=node_modules --exclude-dir=.next . | head -60
+      - name: neon sql call sites (non-tagged)
+        run: grep -rn --include=*.ts -E "\bsql\(|\bneonSql\(|\.transaction\(" server shared scripts app 2>/dev/null | grep -v "drizzle" | head -60
+      - name: openai usages
+        run: grep -rn --include=*.ts --include=*.tsx -E "from ['\"]openai|require\(['\"]openai|new OpenAI|openai\.[a-zA-Z]+\.[a-zA-Z]+" --exclude-dir=node_modules --exclude-dir=.next . | head -60
+      - name: archiver usages
+        run: grep -rn --include=*.ts --include=*.tsx --include=*.mjs -E "archiver" --exclude-dir=node_modules --exclude-dir=.next . | head -40
+      - name: PR diffs of package.json for dependabot branches
+        run: |
+          git fetch origin '+refs/heads/dependabot/*:refs/remotes/origin/dependabot/*' --depth=1 || true
+          git branch -r | grep dependabot || true
