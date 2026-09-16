@@ -7,7 +7,9 @@ tmp/
 
 # Development and tooling
 .local/
-artifacts/
+# NOTE: artifacts/ is intentionally NOT ignored. Railpack detects
+# artifacts/mockup-sandbox/package.json in the repo and the Railway build fails
+# with "not found" if it is excluded from the build context.
 .git/
 .agents/
 .playwright/
