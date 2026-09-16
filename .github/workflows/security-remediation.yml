@@ -39,8 +39,25 @@ jobs:
             npm audit --package-lock-only || true
           fi
 
+      - name: Root - upgrade sharp (libvips/libheif CVEs; 0.34 -> 0.35)
+        run: npm install sharp@^0.35.4
+
       - name: Root - reinstall from updated lockfile
         run: npm install
+
+      - name: sharp runtime smoke test (APIs used by server/)
+        run: |
+          cat > /tmp/sharp-smoke.mjs <<'JS'
+          import sharp from "sharp";
+          const svg = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630"><rect width="1200" height="630" fill="#0b3d91"/><text x="60" y="320" font-size="64" fill="#fff">GetCyberRight</text></svg>');
+          const png = await sharp(svg).png({ quality: 95 }).toBuffer();
+          const logo = await sharp({ create: { width: 120, height: 120, channels: 4, background: { r: 255, g: 255, b: 255, alpha: 0.8 } } }).png().toBuffer();
+          const out = await sharp(png).resize(1080, 1080, { fit: "cover" }).composite([{ input: logo, top: 20, left: 20 }]).jpeg({ quality: 85 }).toBuffer();
+          const m = await sharp(out).metadata();
+          if (m.width !== 1080 || m.height !== 1080 || m.format !== "jpeg") throw new Error("unexpected output " + JSON.stringify(m));
+          console.log("sharp", sharp.versions, "smoke test OK", m.width, m.height, m.format);
+          JS
+          cp /tmp/sharp-smoke.mjs ./sharp-smoke.mjs && node ./sharp-smoke.mjs && rm ./sharp-smoke.mjs
 
       - name: Root - audit AFTER
         run: |
@@ -51,6 +68,9 @@ jobs:
 
       - name: Build project (verification)
         run: npm run build --if-present
+
+      - name: Same gate as main CI (informational)
+        run: npm audit --audit-level=high && echo "AUDIT GATE PASSES" || echo "AUDIT GATE STILL FAILS"
 
       - name: Commit updated manifests
         run: |
