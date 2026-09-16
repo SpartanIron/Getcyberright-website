@@ -1,0 +1,64 @@
+# TEMPORARY helper workflow: remove from this branch before merging to main.
+name: Security dependency remediation (temporary)
+
+on:
+  push:
+    branches: [ "security/dependency-remediation" ]
+
+permissions:
+  contents: write
+
+jobs:
+  remediate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v7
+
+      - name: Use Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20.x
+
+      - name: Root - install
+        run: npm install
+
+      - name: Root - audit BEFORE
+        run: npm audit --audit-level=high || true
+
+      - name: Root - npm audit fix (non-breaking)
+        run: npm audit fix || true
+
+      - name: Mockup sandbox - audit fix (lockfile only)
+        working-directory: artifacts/mockup-sandbox
+        run: |
+          if [ -f package.json ]; then
+            npm audit fix --package-lock-only --ignore-scripts || true
+            echo "===== SANDBOX AUDIT AFTER ====="
+            npm audit --package-lock-only || true
+          fi
+
+      - name: Root - reinstall from updated lockfile
+        run: npm install
+
+      - name: Root - audit AFTER
+        run: |
+          echo "===== ROOT AUDIT AFTER ====="
+          npm audit || true
+          echo "===== KEY VERSIONS ====="
+          npm ls next tar undici ws vite sharp nanoid postcss brace-expansion form-data --all 2>/dev/null | grep -E "next@|tar@|undici@|ws@|vite@|sharp@|nanoid@|postcss@|brace-expansion@|form-data@" | sort -u || true
+
+      - name: Build project (verification)
+        run: npm run build --if-present
+
+      - name: Commit updated manifests
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898299+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json artifacts/mockup-sandbox/package.json artifacts/mockup-sandbox/package-lock.json 2>/dev/null || true
+          git diff --cached --stat
+          if git diff --cached --quiet; then echo "No changes"; else
+            git commit -m "fix(deps): npm audit fix for root and mockup-sandbox lockfiles"
+            git push
+          fi
