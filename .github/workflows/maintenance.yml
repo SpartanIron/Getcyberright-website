@@ -6,28 +6,50 @@ on:
 permissions:
   contents: read
 jobs:
-  investigate:
+  railpack:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - name: A openai any reference
-        run: grep -rn -i "openai" --include=*.ts --include=*.tsx --include=*.mjs --include=*.js --exclude-dir=node_modules --exclude-dir=.next --exclude-dir=dist . | grep -v -i "AI_INTEGRATIONS_OPENAI\|openai.com" | head -40
-      - name: B neon / drizzle config / db driver
+      - name: Repo structure Railpack reads
         run: |
-          cat drizzle.config.ts
-          grep -rn -E "from ['\"](postgres|pg|drizzle-orm/[a-z-]+)['\"]|import\(['\"]@neondatabase" --include=*.ts --exclude-dir=node_modules . | head -20
-      - name: C archiver route
-        run: sed -n '5440,5520p' server/routes.ts
-      - name: D downloadSocialImage + bulk upload call sites
+          { echo "== lockfile non-node_modules package entries =="; jq -r '.packages | keys[] | select(startswith("node_modules")|not)' package-lock.json | grep -v '/node_modules/' ;
+            echo "== root workspaces =="; jq '.workspaces' package.json; jq '.packages[""].workspaces' package-lock.json;
+            echo "== any workspace config files =="; ls -la pnpm-workspace.yaml .replit lerna.json turbo.json nx.json 2>&1;
+            echo "== nested package.json files (excluding node_modules) =="; find . -name package.json -not -path "*/node_modules/*" -not -path "./.git/*";
+            echo "== artifacts tree =="; ls -la artifacts artifacts/mockup-sandbox; git log --oneline -3 -- artifacts .dockerignore;
+          } > report.txt 2>&1
+          { echo '```'; cat report.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+  runtime-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22.x
+      - name: archiver 8 test with exact route usage
         run: |
-          sed -n '50,99p' server/imageStorage.ts
-          sed -n '210,245p' server/routes.ts
-          sed -n '315,335p' server/index.ts
-      - name: E tests and test runner
+          mkdir -p /tmp/arch && cd /tmp/arch && npm init -y >/dev/null && npm pkg set type=module && npm i archiver@8 >/dev/null 2>&1
+          npm ls archiver | tee -a $GITHUB_WORKSPACE/r2.txt
+          cat > t.mjs <<'JS'
+          import fs from "fs";
+          const mod = await import("archiver");
+          console.log("export keys:", Object.keys(mod));
+          const archiver = mod.default;
+          console.log("typeof default:", typeof archiver);
+          const out = fs.createWriteStream("/tmp/arch/x.zip");
+          const archive = archiver("zip", { zlib: { level: 9 } });
+          archive.pipe(out);
+          archive.directory(process.env.GITHUB_WORKSPACE + "/browser-extension", "gcr-guard-extension");
+          await archive.finalize();
+          await new Promise(r => out.on("close", r));
+          console.log("zip bytes:", fs.statSync("/tmp/arch/x.zip").size);
+          JS
+          node t.mjs 2>&1 | tee -a $GITHUB_WORKSPACE/r2.txt || true
+      - name: Node 24 build readiness
         run: |
-          head -30 tests/shield-security.test.ts
-          grep -rn "node:test\|vitest\|jest" tests | head
-      - name: F dependabot PR package.json diffs
-        run: |
-          git fetch --no-tags origin '+refs/heads/dependabot/*:refs/remotes/origin/dependabot/*'
-          for b in $(git branch -r | grep dependabot); do echo "===== $b ====="; git diff origin/main...$b -- package.json .github | head -30; done
+          echo "== Node 24 ==" >> r2.txt
+          npx -y node@24 --version >> r2.txt 2>&1 || true
+      - name: Summary
+        if: always()
+        run: '{ echo "\`\`\`"; cat r2.txt; echo "\`\`\`"; } >> "$GITHUB_STEP_SUMMARY"'
