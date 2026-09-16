@@ -14,11 +14,13 @@ jobs:
         run: |
           { echo "== lockfile non-node_modules package entries =="; jq -r '.packages | keys[] | select(startswith("node_modules")|not)' package-lock.json | grep -v '/node_modules/' ;
             echo "== root workspaces =="; jq '.workspaces' package.json; jq '.packages[""].workspaces' package-lock.json;
-            echo "== any workspace config files =="; ls -la pnpm-workspace.yaml .replit lerna.json turbo.json nx.json 2>&1;
+            echo "== any workspace config files =="; ls -la pnpm-workspace.yaml .replit lerna.json turbo.json nx.json 2>&1 || true;
             echo "== nested package.json files (excluding node_modules) =="; find . -name package.json -not -path "*/node_modules/*" -not -path "./.git/*";
             echo "== artifacts tree =="; ls -la artifacts artifacts/mockup-sandbox; git log --oneline -3 -- artifacts .dockerignore;
-          } > report.txt 2>&1
+          } > report.txt 2>&1 || true
           { echo '```'; cat report.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          { echo '== .replit =='; cat .replit 2>/dev/null | head -60; echo '== mockup package.json =='; cat artifacts/mockup-sandbox/package.json | head -30; } > r3.txt 2>&1 || true
+          { echo '```'; cat r3.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
 
   runtime-tests:
     runs-on: ubuntu-latest
@@ -33,19 +35,21 @@ jobs:
           npm ls archiver | tee -a $GITHUB_WORKSPACE/r2.txt
           cat > t.mjs <<'JS'
           import fs from "fs";
-          const mod = await import("archiver");
-          console.log("export keys:", Object.keys(mod));
-          const archiver = mod.default;
-          console.log("typeof default:", typeof archiver);
+          const { ZipArchive } = await import("archiver");
           const out = fs.createWriteStream("/tmp/arch/x.zip");
-          const archive = archiver("zip", { zlib: { level: 9 } });
+          const archive = new ZipArchive({ zlib: { level: 9 } });
+          archive.on("error", e => { throw e; });
           archive.pipe(out);
           archive.directory(process.env.GITHUB_WORKSPACE + "/browser-extension", "gcr-guard-extension");
           await archive.finalize();
           await new Promise(r => out.on("close", r));
           console.log("zip bytes:", fs.statSync("/tmp/arch/x.zip").size);
+          const { execSync } = await import("child_process");
+          console.log(execSync("unzip -l /tmp/arch/x.zip | tail -5").toString());
           JS
           node t.mjs 2>&1 | tee -a $GITHUB_WORKSPACE/r2.txt || true
+          echo '== archiver 7 (current) zip bytes for comparison ==' >> $GITHUB_WORKSPACE/r2.txt
+          mkdir -p /tmp/a7 && cd /tmp/a7 && npm init -y >/dev/null && npm pkg set type=module && npm i archiver@7 >/dev/null 2>&1 && node -e 'import("archiver").then(async m=>{const fs=await import("fs");const o=fs.createWriteStream("/tmp/a7/x.zip");const a=m.default("zip",{zlib:{level:9}});a.pipe(o);a.directory(process.env.GITHUB_WORKSPACE+"/browser-extension","gcr-guard-extension");await a.finalize();o.on("close",()=>console.log("v7 bytes",fs.statSync("/tmp/a7/x.zip").size))})' >> $GITHUB_WORKSPACE/r2.txt 2>&1 || true
       - name: Node 24 build readiness
         run: |
           echo "== Node 24 ==" >> r2.txt
