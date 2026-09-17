@@ -1,4 +1,5 @@
 import { Sentry } from "./instrument";
+import { runAsBackground, runOnSingleReplica } from "./aiGuard";
 import express, { type Request, Response, NextFunction } from "express";
 import cookieParser from "cookie-parser";
 import compression from "compression";
@@ -293,7 +294,8 @@ async function bootstrapFullApp() {
         .catch(() => {});
     });
 
-    startBackgroundJobs();
+    // AI cost guard: run scheduled jobs on one replica only, tagged as background AI work
+    runOnSingleReplica(() => runAsBackground(() => startBackgroundJobs()));
 
   } catch (err: any) {
     log(`Bootstrap failed: ${err.message}`);
