@@ -1,5 +1,6 @@
 import { Sentry } from "./instrument";
 import { runAsBackground, runOnSingleReplica } from "./aiGuard";
+import "./memoryMonitor";
 import express, { type Request, Response, NextFunction } from "express";
 import cookieParser from "cookie-parser";
 import compression from "compression";

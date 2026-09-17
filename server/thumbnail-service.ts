@@ -17,6 +17,15 @@ export class ThumbnailService {
     return ThumbnailService.instance;
   }
 
+  private remember(url: string, value: ThumbnailResult): void {
+    // Bounded cache: evict the oldest entry once 2000 URLs are stored.
+    if (this.cache.size >= 2000) {
+      const oldest = this.cache.keys().next().value;
+      if (oldest !== undefined) this.cache.delete(oldest);
+    }
+    this.cache.set(url, value);
+  }
+
   private isInternalUrl(urlString: string): boolean {
     try {
       const parsed = new URL(urlString);
@@ -65,13 +74,18 @@ export class ThumbnailService {
       }
 
       const html = await response.text();
-      const dom = new JSDOM(html);
-      const document = dom.window.document;
-
-      const result = this.extractThumbnail(document, url);
+      // Cap parse size (the metadata we need is in <head>) and always close the window:
+      // an unclosed JSDOM window keeps the whole DOM alive (~10 MB per page in testing).
+      const dom = new JSDOM(html.length > 1_000_000 ? html.slice(0, 1_000_000) : html);
+      let result: ThumbnailResult;
+      try {
+        result = this.extractThumbnail(dom.window.document, url);
+      } finally {
+        dom.window.close();
+      }
       
       // Cache the result
-      this.cache.set(url, result);
+      this.remember(url, result);
       
       return result;
     } catch (error) {
@@ -79,7 +93,7 @@ export class ThumbnailService {
       
       // Return fallback based on domain
       const fallback = this.getDomainFallback(url);
-      this.cache.set(url, fallback);
+      this.remember(url, fallback);
       return fallback;
     }
   }

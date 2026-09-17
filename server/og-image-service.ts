@@ -268,6 +268,17 @@ export async function handleArticleOgImage(req: Request, res: Response) {
       readTime: (article as any).readTime ?? null,
     });
 
+    // Bounded cache: drop expired entries, then the oldest, once 200 images are held.
+    if (pngCache.size >= 200) {
+      const now = Date.now();
+      pngCache.forEach((entry, key) => {
+        if (now - entry.ts >= CACHE_TTL_MS) pngCache.delete(key);
+      });
+      if (pngCache.size >= 200) {
+        const oldest = pngCache.keys().next().value;
+        if (oldest !== undefined) pngCache.delete(oldest);
+      }
+    }
     pngCache.set(slug, { png, ts: Date.now() });
     res.setHeader("Content-Type", "image/png");
     res.setHeader("Cache-Control", "public, max-age=21600, s-maxage=21600");
