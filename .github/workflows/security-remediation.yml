@@ -2,7 +2,7 @@ name: Security remediation (temporary)
 
 on:
   push:
-    branches: [ "security/dependency-remediation" ]
+    branches: [ "security/dependency-remediation-1" ]
 
 permissions:
   contents: write
