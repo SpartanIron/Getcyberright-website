@@ -10,7 +10,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Check, Copy, Share2 } from "lucide-react";
-import { SiX, SiFacebook, SiLinkedin, SiWhatsapp } from "react-icons/si";
+import { SiX, SiFacebook, SiWhatsapp } from "react-icons/si";
+import { FaLinkedin } from "react-icons/fa";
 
 interface SocialShareProps {
   title: string;
@@ -107,7 +108,7 @@ export function SocialShare({
                 className="h-10 w-10 rounded-full bg-white dark:bg-slate-800 shadow-lg hover:bg-blue-50 dark:hover:bg-blue-900/20"
                 onClick={() => handleShare("linkedin")}
               >
-                <SiLinkedin className="h-4 w-4 text-blue-700" />
+                <FaLinkedin className="h-4 w-4 text-blue-700" />
               </Button>
             </TooltipTrigger>
             <TooltipContent side="left">Share on LinkedIn</TooltipContent>
@@ -191,7 +192,7 @@ export function SocialShare({
               className={`${buttonSize} hover:bg-blue-50 dark:hover:bg-blue-900/20`}
               onClick={() => handleShare("linkedin")}
             >
-              <SiLinkedin className={`${iconSize} text-blue-700`} />
+              <FaLinkedin className={`${iconSize} text-blue-700`} />
             </Button>
           </TooltipTrigger>
           <TooltipContent>Share on LinkedIn</TooltipContent>

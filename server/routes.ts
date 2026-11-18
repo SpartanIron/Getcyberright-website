@@ -5459,7 +5459,7 @@ BEHAVIORAL CONSTRAINTS
     try {
       const path = await import("path");
       const fs = await import("fs");
-      const archiver = (await import("archiver")).default;
+      const { ZipArchive } = await import("archiver");
       const extensionDir = path.default.join(process.cwd(), "browser-extension");
 
       if (!fs.existsSync(extensionDir)) {
@@ -5468,9 +5468,9 @@ BEHAVIORAL CONSTRAINTS
       }
 
       res.setHeader("Content-Type", "application/zip");
-      res.setHeader("Content-Disposition", "attachment, filename=gcr-guard-extension.zip");
+      res.setHeader("Content-Disposition", "attachment; filename=gcr-guard-extension.zip");
 
-      const archive = archiver("zip", { zlib: { level: 9 } });
+      const archive = new ZipArchive({ zlib: { level: 9 } });
       archive.pipe(res);
       archive.directory(extensionDir, "gcr-guard-extension");
       await archive.finalize();
