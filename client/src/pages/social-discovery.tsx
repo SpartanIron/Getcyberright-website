@@ -12,7 +12,8 @@ import {
   Lock, ShieldAlert, Smartphone, Users, Globe, AlertTriangle,
   Heart, Wrench, Database, Briefcase, BarChart3, Megaphone,
 } from "lucide-react";
-import { SiWhatsapp, SiFacebook, SiLinkedin, SiX } from "react-icons/si";
+import { SiWhatsapp, SiFacebook, SiX } from "react-icons/si";
+import { FaLinkedin } from "react-icons/fa";
 
 type CardCategory = "scam-alerts" | "quick-tips" | "safety-stats" | "awareness-campaigns";
 
@@ -199,7 +200,7 @@ function CardActions({ card }: { card: SafetyCard }) {
       <ShareLink
         href={linkedinUrl}
         label="LinkedIn"
-        Icon={SiLinkedin}
+        Icon={FaLinkedin}
         testId={`share-linkedin-${card.id}`}
       />
       <ShareLink

@@ -1,7 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { SiX, SiFacebook, SiLinkedin, SiWhatsapp } from "react-icons/si";
+import { SiX, SiFacebook, SiWhatsapp } from "react-icons/si";
+import { FaLinkedin } from "react-icons/fa";
 import { Link2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -79,7 +80,7 @@ export function ShareButtons({
         onClick={() => window.open(shareLinks.linkedin, "_blank", "width=550,height=420")}
         title="Share on LinkedIn"
       >
-        <SiLinkedin className="h-4 w-4" />
+        <FaLinkedin className="h-4 w-4" />
       </Button>
       <Button
         variant="outline"
