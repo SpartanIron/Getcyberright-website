@@ -126,7 +126,7 @@
     "speakeasy": "^2.0.0",
     "stripe": "^20.4.1",
     "stripe-replit-sync": "^1.0.0",
-    "tailwind-merge": "^3.4.0",
+    "tailwind-merge": "^3.7.1",
     "tailwindcss": "^3.4.17",
     "tailwindcss-animate": "^1.0.7",
     "tesseract.js": "^7.0.0",
